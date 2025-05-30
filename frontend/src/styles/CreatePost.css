@@ -1,0 +1,70 @@
+.create-post-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 25px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 32px rgba(255, 129, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 129, 0, 0.18);
+}
+
+.create-post-title {
+  text-align: center;
+  color: #ff8100;
+  margin-bottom: 25px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.create-post-input, .create-post-textarea {
+  width: calc(100% - 30px);
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 129, 0, 0.2);
+  border-radius: 12px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin: 0 auto 15px auto;
+  display: block;
+  box-sizing: border-box;
+}
+
+.create-post-textarea {
+  min-height: 200px;
+  resize: vertical;
+  margin-bottom: 20px;
+}
+
+.create-post-input:focus,
+.create-post-textarea:focus {
+  outline: none;
+  border-color: #ff8100;
+  box-shadow: 0 0 0 3px rgba(255, 129, 0, 0.2);
+}
+
+.create-post-button {
+  width: 100%;
+  padding: 15px;
+  background-color: #ff8100;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(255, 129, 0, 0.3);
+}
+
+.create-post-button:hover {
+  background-color: #ff9500;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 129, 0, 0.4);
+}
+
+.create-post-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(255, 129, 0, 0.2);
+}

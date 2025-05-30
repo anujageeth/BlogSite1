@@ -1,0 +1,103 @@
+.login-container {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 25px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 32px rgba(255, 129, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 129, 0, 0.18);
+}
+
+.login-title {
+  text-align: center;
+  color: #ff8100;
+  margin-bottom: 25px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.login-input {
+  width: calc(100% - 30px); /* Account for padding */
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 129, 0, 0.2);
+  border-radius: 12px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin: 0 auto;
+  display: block;
+  box-sizing: border-box;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: #ff8100;
+  box-shadow: 0 0 0 3px rgba(255, 129, 0, 0.2);
+}
+
+.login-button {
+  width: 100%;
+  padding: 15px;
+  background-color: #ff8100;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(255, 129, 0, 0.3);
+}
+
+.login-button:hover {
+  background-color: #ff9500;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 129, 0, 0.4);
+}
+
+.login-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(255, 129, 0, 0.2);
+}
+
+.toggle-button {
+  width: 100%;
+  padding: 15px;
+  background-color: transparent;
+  border: 2px solid #ff8100;
+  color: #ff8100;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 15px;
+  transition: all 0.3s ease;
+}
+
+.toggle-button:hover {
+  background-color: rgba(255, 129, 0, 0.1);
+}
+
+.error-message {
+  color: #ff3b30;
+  font-size: 14px;
+  margin-top: 8px;
+  text-align: center;
+  padding: 10px;
+  background: rgba(255, 59, 48, 0.1);
+  border-radius: 8px;
+}
+
+/* Add to body tag for better background effect */
+body {
+  background: linear-gradient(135deg, #fff5e6 0%, #fff 100%);
+  min-height: 100vh;
+}

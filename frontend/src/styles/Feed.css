@@ -1,0 +1,48 @@
+.feed-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 25px;
+}
+
+.feed-title {
+  text-align: center;
+  color: #ff8100;
+  margin-bottom: 25px;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.post-card {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 32px rgba(255, 129, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 129, 0, 0.18);
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-2px);
+}
+
+.post-title {
+  color: #ff8100;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.post-content {
+  color: #333;
+  line-height: 1.6;
+}
+
+.post-meta {
+  color: #666;
+  font-size: 14px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 129, 0, 0.1);
+}
