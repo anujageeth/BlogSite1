@@ -10,7 +10,13 @@ router.get('/', async (req, res) => {
     const posts = await Post.find()
       .populate('author', 'firstName lastName profilePicture')
       .sort({ createdAt: -1 });
-    res.json(posts);
+    
+    const transformedPosts = posts.map(post => ({
+      ...post.toObject(),
+      likes: post.likes?.length || 0
+    }));
+    
+    res.json(transformedPosts);
   } catch (err) {
     res.status(500).json({ msg: "Error fetching posts" });
   }
@@ -104,6 +110,52 @@ router.put('/:id', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error('Update error:', err);
     res.status(500).json({ msg: "Error updating post" });
+  }
+});
+
+// Like/Unlike post
+router.post('/:id/like', authMiddleware, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ msg: "Post not found" });
+    }
+
+    const likeIndex = post.likes.indexOf(req.user.id);
+    if (likeIndex > -1) {
+      // Unlike
+      post.likes.splice(likeIndex, 1);
+    } else {
+      // Like
+      post.likes.push(req.user.id);
+    }
+
+    await post.save();
+    res.json({ 
+      likes: post.likes.length,
+      isLiked: likeIndex === -1
+    });
+  } catch (err) {
+    console.error('Like error:', err);
+    res.status(500).json({ msg: "Error updating like" });
+  }
+});
+
+// Get post likes
+router.get('/:id/likes', authMiddleware, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ msg: "Post not found" });
+    }
+
+    const isLiked = post.likes.includes(req.user.id);
+    res.json({
+      likes: post.likes.length,
+      isLiked
+    });
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching likes" });
   }
 });
 

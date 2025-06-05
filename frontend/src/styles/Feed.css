@@ -90,6 +90,87 @@
   position: relative;
 }
 
+.post-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.interaction-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.interaction-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.interaction-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 129, 0, 0.1);
+  border-radius: 20px;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.interaction-button:hover::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.interaction-button:hover {
+  color: #ff8100;
+  transform: translateY(-1px);
+}
+
+.interaction-button.liked {
+  color: #ff8100;
+}
+
+.interaction-button svg {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+.interaction-button:hover svg {
+  transform: scale(1.15) rotate(5deg);
+}
+
+.interaction-button span {
+  min-width: 20px;
+  text-align: left;
+  z-index: 1;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.interaction-button:hover span {
+  transform: scale(1.05);
+}
+
+.interaction-button:active {
+  transform: translateY(0);
+}
+
+.interaction-button:active svg {
+  transform: scale(0.95);
+}
+
 .post-menu-button {
   background: none;
   border: none;
@@ -217,5 +298,18 @@
 
   .post-content {
     font-size: 14px;
+  }
+
+  .post-actions-group {
+    gap: 8px;
+  }
+
+  .interaction-buttons {
+    gap: 8px;
+  }
+
+  .interaction-button {
+    padding: 4px 8px;
+    font-size: 13px;
   }
 }

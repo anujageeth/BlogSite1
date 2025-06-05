@@ -73,6 +73,17 @@
   position: relative;
 }
 
+.post-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.interaction-buttons {
+  display: flex;
+  gap: 12px;
+}
+
 .edit-button,
 .delete-button {
   padding: 8px 16px;
@@ -185,6 +196,90 @@
   color: #ff3b30;
 }
 
+.post-detail-footer {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 129, 0, 0.1);
+  display: flex;
+  justify-content: flex-start;
+}
+
+.post-detail-footer .interaction-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.post-detail-footer .interaction-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: #666;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.post-detail-footer .interaction-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 129, 0, 0.1);
+  border-radius: 20px;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.post-detail-footer .interaction-button:hover::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.post-detail-footer .interaction-button:hover {
+  color: #ff8100;
+  transform: translateY(-1px);
+}
+
+.post-detail-footer .interaction-button.liked {
+  color: #ff8100;
+}
+
+.post-detail-footer .interaction-button svg {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+.post-detail-footer .interaction-button:hover svg {
+  transform: scale(1.15) rotate(5deg);
+}
+
+.post-detail-footer .interaction-button span {
+  min-width: 20px;
+  text-align: left;
+  font-weight: 500;
+  z-index: 1;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.post-detail-footer .interaction-button:hover span {
+  transform: scale(1.05);
+}
+
+.post-detail-footer .interaction-button:active {
+  transform: translateY(0);
+}
+
+.post-detail-footer .interaction-button:active svg {
+  transform: scale(0.95);
+}
+
 @keyframes dropdownFade {
   from {
     opacity: 0;
@@ -220,5 +315,15 @@
   
   .back-button::before {
     font-size: 18px;
+  }
+
+  .post-detail-footer {
+    margin-top: 20px;
+    padding-top: 15px;
+  }
+
+  .post-detail-footer .interaction-button {
+    padding: 6px 12px;
+    font-size: 14px;
   }
 }
