@@ -1,5 +1,6 @@
 import express from 'express';
 import Post from '../models/Post.js';
+import Comment from '../models/Comment.js';
 import { authMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -156,6 +157,37 @@ router.get('/:id/likes', authMiddleware, async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ msg: "Error fetching likes" });
+  }
+});
+
+// Get post comments
+router.get('/:id/comments', authMiddleware, async (req, res) => {
+  try {
+    const comments = await Comment.find({ post: req.params.id })
+      .sort({ createdAt: -1 });
+    res.json(comments);
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching comments" });
+  }
+});
+
+// Add comment
+router.post('/:id/comments', authMiddleware, async (req, res) => {
+  try {
+    const { content } = req.body;
+    const comment = new Comment({
+      content,
+      post: req.params.id,
+      author: req.user.id,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+      profilePicture: req.user.profilePicture
+    });
+    
+    await comment.save();
+    res.status(201).json(comment);
+  } catch (err) {
+    res.status(500).json({ msg: "Error creating comment" });
   }
 });
 

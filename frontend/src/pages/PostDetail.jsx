@@ -5,6 +5,7 @@ import Navbar from '../components/NavBar';
 import Avatar from '../components/Avatar';
 import useClickOutside from '../hooks/useClickOutside';
 import ConfirmDialog from '../components/ConfirmDialog';
+import Comment from '../components/Comment';
 import '../styles/PostDetail.css';
 
 function PostDetail() {
@@ -16,6 +17,9 @@ function PostDetail() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const [comments, setComments] = useState([]);
+  const [commentInput, setCommentInput] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const dropdownRef = useRef(null);
   const { postId } = useParams();
   const navigate = useNavigate();
@@ -70,6 +74,25 @@ function PostDetail() {
     }
   }, [post, currentUser, postId]);
 
+  // Add this useEffect for fetching comments
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/posts/${postId}/comments`,
+          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        );
+        setComments(res.data);
+      } catch (err) {
+        console.error('Error fetching comments:', err);
+      }
+    };
+
+    if (post) {
+      fetchComments();
+    }
+  }, [post, postId]);
+
   const handleDelete = async () => {
     try {
       await axios.delete(`http://localhost:5000/api/posts/${postId}`, {
@@ -99,6 +122,27 @@ function PostDetail() {
       setLikeCount(res.data.likes);
     } catch (err) {
       console.error('Error updating like:', err);
+    }
+  };
+
+  // Add comment handler
+  const handleComment = async (e) => {
+    e.preventDefault();
+    if (!commentInput.trim() || isSubmitting) return;
+
+    try {
+      setIsSubmitting(true);
+      const res = await axios.post(
+        `http://localhost:5000/api/posts/${postId}/comments`,
+        { content: commentInput },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      setComments(prev => [res.data, ...prev]);
+      setCommentInput('');
+    } catch (err) {
+      console.error('Error posting comment:', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -185,25 +229,62 @@ function PostDetail() {
           <h1 className="post-detail-title">{post.title}</h1>
           <p className="post-detail-content">{post.content}</p>
           
-          {/* Add interaction buttons */}
+          {/* Update the post-detail-footer section */}
           <div className="post-detail-footer">
-            <div className="interaction-buttons">
-              <button 
-                className={`interaction-button ${isLiked ? 'liked' : ''}`}
-                onClick={handleLike}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path 
-                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" 
-                    fill={isLiked ? "#ff8100" : "none"} 
-                    stroke={isLiked ? "#ff8100" : "currentColor"}
-                    strokeWidth="2"
-                  />
-                </svg>
-                <span>{likeCount}</span>
-              </button>
+            <div className="post-interactions">
+                <div className="interaction-buttons">
+                    <button 
+                        className={`interaction-button ${isLiked ? 'liked' : ''}`}
+                        onClick={handleLike}
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path 
+                            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" 
+                            fill={isLiked ? "#ff8100" : "none"} 
+                            stroke={isLiked ? "#ff8100" : "currentColor"}
+                            strokeWidth="2"
+                            />
+                        </svg>
+                        <span>{likeCount}</span>
+                    </button>
+                </div>
+              <form className="comment-form" onSubmit={handleComment}>
+                <input
+                  type="text"
+                  className="comment-input"
+                  placeholder="Write a comment..."
+                  value={commentInput}
+                  onChange={(e) => setCommentInput(e.target.value)}
+                />
+                <button 
+                  type="submit" 
+                  className="comment-submit"
+                  disabled={isSubmitting}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path 
+                      d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              </form>
+              
             </div>
           </div>
+          {comments.length > 0 && (
+            <div className="comments-section">
+              <h3 className="comments-title">Comments ({comments.length})</h3>
+              <div className="comments-list">
+                {comments.map(comment => (
+                  <Comment key={comment._id} comment={comment} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <ConfirmDialog
