@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Feed from './pages/Feed';
 import CreatePost from './pages/CreatePost';
 import Profile from './pages/Profile';
+import EditPost from './pages/EditPost';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/feed" element={<Feed />} />
         <Route path="/create" element={<CreatePost />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/edit-post/:postId" element={<EditPost />} />
       </Routes>
     </BrowserRouter>
   );

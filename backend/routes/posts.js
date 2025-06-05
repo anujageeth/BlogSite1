@@ -4,22 +4,107 @@ import { authMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();
 
+// Get all posts
 router.get('/', async (req, res) => {
-  const posts = await Post.find().sort({ createdAt: -1 });
-  res.json(posts);
+  try {
+    const posts = await Post.find()
+      .populate('author', 'firstName lastName profilePicture')
+      .sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching posts" });
+  }
 });
 
+// Create post
 router.post('/', authMiddleware, async (req, res) => {
-  const { title, content } = req.body;
-  const post = new Post({ title, content, author: req.user.email, firstName: req.user.firstName, lastName: req.user.lastName });
-  await post.save();
-  res.status(201).json(post);
+  try {
+    const { title, content } = req.body;
+    const post = new Post({
+      title,
+      content,
+      author: req.user.id,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+      profilePicture: req.user.profilePicture
+    });
+    const savedPost = await post.save();
+    res.status(201).json(savedPost);
+  } catch (err) {
+    res.status(500).json({ msg: "Error creating post" });
+  }
 });
 
+// Get user's posts
 router.get('/user', authMiddleware, async (req, res) => {
-  const posts = await Post.find({ author: req.user.email })
-    .sort({ createdAt: -1 });
-  res.json(posts);
+  try {
+    const posts = await Post.find({ author: req.user.id })
+      .sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching user posts" });
+  }
+});
+
+// Get single post
+router.get('/:id', authMiddleware, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ msg: "Post not found" });
+    }
+    res.json(post);
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching post" });
+  }
+});
+
+// Delete post
+router.delete('/:id', authMiddleware, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    
+    if (!post) {
+      return res.status(404).json({ msg: "Post not found" });
+    }
+
+    // Check if user owns the post
+    if (String(post.author) !== String(req.user.id)) {
+      return res.status(403).json({ msg: "Not authorized to delete this post" });
+    }
+
+    await post.deleteOne();
+    res.json({ msg: "Post deleted successfully" });
+  } catch (err) {
+    console.error('Delete error:', err);
+    res.status(500).json({ msg: "Error deleting post" });
+  }
+});
+
+// Update post
+router.put('/:id', authMiddleware, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    
+    if (!post) {
+      return res.status(404).json({ msg: "Post not found" });
+    }
+
+    // Check if user owns the post
+    if (String(post.author) !== String(req.user.id)) {
+      return res.status(403).json({ msg: "Not authorized to edit this post" });
+    }
+
+    const { title, content } = req.body;
+    post.title = title;
+    post.content = content;
+    await post.save();
+
+    res.json({ msg: "Post updated successfully", post });
+  } catch (err) {
+    console.error('Update error:', err);
+    res.status(500).json({ msg: "Error updating post" });
+  }
 });
 
 export default router;

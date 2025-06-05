@@ -52,7 +52,6 @@
 
 .user-info {
   display: flex;
-  flex-direction: column;
   padding: 8px 16px;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(255, 129, 0, 0.2);
@@ -62,10 +61,17 @@
   min-width: 180px;
 }
 
-.user-info:hover {
-  background: rgba(255, 129, 0, 0.1);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(255, 129, 0, 0.1);
+.user-info-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .user-name {

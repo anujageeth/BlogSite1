@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import Avatar from './Avatar';
 import '../styles/NavBar.css';
 
 function Navbar() {
@@ -43,10 +44,20 @@ function Navbar() {
             className="user-info" 
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            <span className="user-name">
-              {userInfo.firstName} {userInfo.lastName}
-            </span>
-            <span className="user-email">{userInfo.email}</span>
+            <div className="user-info-content">
+              <Avatar 
+                firstName={userInfo.firstName}
+                lastName={userInfo.lastName}
+                profilePicture={userInfo.profilePicture}
+                size="small"
+              />
+              <div className="user-details">
+                <span className="user-name">
+                  {userInfo.firstName} {userInfo.lastName}
+                </span>
+                <span className="user-email">{userInfo.email}</span>
+              </div>
+            </div>
           </div>
           {isDropdownOpen && (
             <div className="dropdown-menu">

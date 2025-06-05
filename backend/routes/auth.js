@@ -35,7 +35,8 @@ router.post('/login', async (req, res) => {
     id: user._id, 
     email: user.email,
     firstName: user.firstName,
-    lastName: user.lastName
+    lastName: user.lastName,
+    profilePicture: user.profilePicture
   }, process.env.JWT_SECRET, {
     expiresIn: '1h'
   });
@@ -44,7 +45,7 @@ router.post('/login', async (req, res) => {
 });
 
 router.put('/update', authMiddleware, async (req, res) => {
-  const { firstName, lastName, email, currentPassword, newPassword } = req.body;
+  const { firstName, lastName, email, currentPassword, newPassword, profilePicture } = req.body;
   
   try {
     const user = await User.findById(req.user.id);
@@ -57,6 +58,9 @@ router.put('/update', authMiddleware, async (req, res) => {
     user.firstName = firstName;
     user.lastName = lastName;
     user.email = email;
+    if (profilePicture) {
+      user.profilePicture = profilePicture;
+    }
     
     // Update password if provided
     if (newPassword) {
@@ -70,7 +74,8 @@ router.put('/update', authMiddleware, async (req, res) => {
       id: user._id, 
       email: user.email,
       firstName: user.firstName,
-      lastName: user.lastName
+      lastName: user.lastName,
+      profilePicture: user.profilePicture
     }, process.env.JWT_SECRET, {
       expiresIn: '1h'
     });

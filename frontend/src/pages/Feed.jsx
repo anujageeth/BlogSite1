@@ -1,30 +1,60 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../styles/Feed.css';
 import Navbar from '../components/NavBar';
+import PostCard from '../components/PostCard';
+import '../styles/Feed.css';
 
 function Feed() {
   const [posts, setPosts] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/posts')
-      .then(res => setPosts(res.data))
-      .catch(err => console.error(err));
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded = JSON.parse(atob(token.split('.')[1]));
+        console.log('Decoded token:', decoded); // Debug log
+        setCurrentUser(decoded);
+      } catch (err) {
+        console.error('Error decoding token:', err);
+      }
+    }
+
+    const fetchPosts = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/posts');
+        console.log('Fetched posts:', res.data); // Debug log
+        setPosts(res.data);
+      } catch (err) {
+        console.error('Error fetching posts:', err);
+      }
+    };
+
+    fetchPosts();
   }, []);
+
+  const handleDelete = async (postId) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/posts/${postId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      setPosts(posts.filter(post => post._id !== postId));
+    } catch (err) {
+      console.error('Error deleting post:', err);
+    }
+  };
 
   return (
     <>
       <Navbar />
       <div className="feed-container">
-        <h2 className="feed-title">All Posts</h2>
         {posts.map(post => (
-          <div key={post._id} className="post-card">
-            <h3 className="post-title">{post.title}</h3>
-            <p className="post-content">{post.content}</p>
-            <div className="post-meta">
-              Posted by {post.firstName} {post.lastName}
-            </div>
-          </div>
+          <PostCard
+            key={post._id}
+            post={post}
+            currentUser={currentUser}
+            onDelete={handleDelete}
+          />
         ))}
       </div>
     </>
