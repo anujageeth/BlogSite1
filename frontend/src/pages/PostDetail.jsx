@@ -4,6 +4,7 @@ import axios from 'axios';
 import Navbar from '../components/NavBar';
 import Avatar from '../components/Avatar';
 import useClickOutside from '../hooks/useClickOutside';
+import ConfirmDialog from '../components/ConfirmDialog';
 import '../styles/PostDetail.css';
 
 function PostDetail() {
@@ -12,6 +13,7 @@ function PostDetail() {
   const [error, setError] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const dropdownRef = useRef(null);
   const { postId } = useParams();
   const navigate = useNavigate();
@@ -47,8 +49,6 @@ function PostDetail() {
   }, [postId, navigate]);
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this post?')) return;
-
     try {
       await axios.delete(`http://localhost:5000/api/posts/${postId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -75,7 +75,23 @@ function PostDetail() {
       <Navbar />
       <div className="post-detail-container">
         <button className="back-button" onClick={() => navigate(-1)}>
-          ← Back
+          <svg 
+            className="back-arrow" 
+            width="18" 
+            height="18" 
+            viewBox="0 0 24 24"
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path 
+              d="M15 4L7 12L15 20" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          Back
         </button>
         <div className="post-detail-card">
           <div className="post-detail-header">
@@ -115,7 +131,7 @@ function PostDetail() {
                     </button>
                     <button
                       className="dropdown-item delete"
-                      onClick={handleDelete}
+                      onClick={() => setShowConfirmDialog(true)}
                     >
                       Delete Post
                     </button>
@@ -128,6 +144,15 @@ function PostDetail() {
           <p className="post-detail-content">{post.content}</p>
         </div>
       </div>
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        message="Are you sure you want to delete this post? This action cannot be undone."
+        onConfirm={() => {
+          handleDelete();
+          setShowConfirmDialog(false);
+        }}
+        onCancel={() => setShowConfirmDialog(false)}
+      />
     </>
   );
 }

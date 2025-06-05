@@ -2,10 +2,12 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Avatar from './Avatar';
 import useClickOutside from '../hooks/useClickOutside';
+import ConfirmDialog from './ConfirmDialog';
 
 function PostCard({ post, currentUser, onDelete }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -16,10 +18,6 @@ function PostCard({ post, currentUser, onDelete }) {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this post?')) {
-      return;
-    }
-
     try {
       setIsDeleting(true);
       await onDelete(post._id);
@@ -35,70 +33,78 @@ function PostCard({ post, currentUser, onDelete }) {
   const isOwner = String(currentUser?.id) === String(post.author);
 
   return (
-    <div className="post-card">
-      <div className="post-header">
-        <div className="post-author">
-          <Avatar
-            firstName={post.firstName}
-            lastName={post.lastName}
-            profilePicture={post.profilePicture}
-            size="small"
-          />
-          <div className="author-info">
-            <span className="author-name">{post.firstName} {post.lastName}</span>
-            <span className="post-date">
-              {new Date(post.createdAt).toLocaleDateString()}
-            </span>
+    <>
+      <div className="post-card">
+        <div className="post-header">
+          <div className="post-author">
+            <Avatar
+              firstName={post.firstName}
+              lastName={post.lastName}
+              profilePicture={post.profilePicture}
+              size="small"
+            />
+            <div className="author-info">
+              <span className="author-name">{post.firstName} {post.lastName}</span>
+              <span className="post-date">
+                {new Date(post.createdAt).toLocaleDateString()}
+              </span>
+            </div>
           </div>
+          {currentUser && (
+            <div className="post-actions" ref={dropdownRef}>
+              <button
+                className="post-menu-button"
+                onClick={toggleDropdown}
+              >
+                <span className="dots"></span>
+              </button>
+              {isDropdownOpen && (
+                <div className="post-dropdown">
+                  {isOwner ? (
+                    <>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => navigate(`/edit-post/${post._id}`)}
+                      >
+                        Edit Post
+                      </button>
+                      <button
+                        className="dropdown-item delete"
+                        onClick={() => setShowConfirmDialog(true)}
+                        disabled={isDeleting}
+                      >
+                        {isDeleting ? 'Deleting...' : 'Delete Post'}
+                      </button>
+                    </>
+                  ) : (
+                    <button className="dropdown-item report">
+                      Report Post
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
-        {currentUser && (
-          <div className="post-actions" ref={dropdownRef}>
-            <button
-              className="post-menu-button"
-              onClick={toggleDropdown}
-            >
-              <span className="dots"></span>
-            </button>
-            {isDropdownOpen && (
-              <div className="post-dropdown">
-                {isOwner ? (
-                  <>
-                    <button
-                      className="dropdown-item"
-                      onClick={() => navigate(`/edit-post/${post._id}`)}
-                    >
-                      Edit Post
-                    </button>
-                    <button
-                      className="dropdown-item delete"
-                      onClick={handleDelete}
-                      disabled={isDeleting}
-                    >
-                      {isDeleting ? 'Deleting...' : 'Delete Post'}
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    className="dropdown-item report"
-                    onClick={() => console.log('Report:', post._id)}
-                  >
-                    Report Post
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+        <div 
+          className="post-content-wrapper"
+          onClick={() => navigate(`/post/${post._id}`)}
+          style={{ cursor: 'pointer' }}
+        >
+          <h3 className="post-title">{post.title}</h3>
+          <p className="post-content">{post.content}</p>
+        </div>
       </div>
-      <div 
-        className="post-content-wrapper"
-        onClick={() => navigate(`/post/${post._id}`)}
-        style={{ cursor: 'pointer' }}
-      >
-        <h3 className="post-title">{post.title}</h3>
-        <p className="post-content">{post.content}</p>
-      </div>
-    </div>
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        message="Are you sure you want to delete this post? This action cannot be undone."
+        onConfirm={() => {
+          handleDelete();
+          setShowConfirmDialog(false);
+        }}
+        onCancel={() => setShowConfirmDialog(false)}
+      />
+    </>
   );
 }
 

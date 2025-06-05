@@ -5,18 +5,35 @@
 }
 
 .back-button {
-  background: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.9);
   border: none;
-  color: #666;
+  color: #ff8100;
   font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
-  padding: 8px 0;
+  padding: 8px 16px;
   margin-bottom: 20px;
-  transition: color 0.3s ease;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(255, 129, 0, 0.1);
+  border: 1px solid rgba(255, 129, 0, 0.18);
 }
 
 .back-button:hover {
+  background: rgba(255, 255, 255, 0.95);
   color: #ff8100;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 129, 0, 0.15);
+}
+
+.back-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(255, 129, 0, 0.1);
 }
 
 .post-detail-card {
@@ -194,5 +211,14 @@
 
   .post-detail-content {
     font-size: 16px;
+  }
+
+  .back-button {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+  
+  .back-button::before {
+    font-size: 18px;
   }
 }
