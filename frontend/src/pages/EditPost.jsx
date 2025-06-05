@@ -85,7 +85,7 @@ function EditPost() {
             <button
               type="button"
               className="create-post-button"
-              onClick={() => navigate('/feed')}
+              onClick={() => navigate(-1)}
               style={{ backgroundColor: '#666' }}
             >
               Cancel

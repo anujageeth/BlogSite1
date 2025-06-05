@@ -120,6 +120,25 @@
   color: #ff8100;
 }
 
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.brand-link {
+  color: #ff8100;
+  text-decoration: none;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  transition: all 0.3s ease;
+}
+
+.brand-link:hover {
+  color: #ff9500;
+}
+
 @keyframes dropdownFade {
   from {
     opacity: 0;

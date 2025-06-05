@@ -33,10 +33,14 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-      <div>
-        <Link to="/" className="nav-link">Home</Link>
-        <Link to="/feed" className="nav-link">Feed</Link>
-        <Link to="/create" className="nav-link">Create Post</Link>
+      <div className="nav-brand">
+        <Link to="/" className="brand-link">
+          BlogSpace
+        </Link>
+        <div className="nav-links">
+          <Link to="/feed" className="nav-link">Feed</Link>
+          <Link to="/create" className="nav-link">Create Post</Link>
+        </div>
       </div>
       {userInfo ? (
         <div className="user-menu" ref={dropdownRef}>

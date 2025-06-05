@@ -1,0 +1,135 @@
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Navbar from '../components/NavBar';
+import Avatar from '../components/Avatar';
+import useClickOutside from '../hooks/useClickOutside';
+import '../styles/PostDetail.css';
+
+function PostDetail() {
+  const [post, setPost] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const { postId } = useParams();
+  const navigate = useNavigate();
+
+  useClickOutside(dropdownRef, () => setIsDropdownOpen(false));
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    // Set current user from token
+    const decoded = JSON.parse(atob(token.split('.')[1]));
+    setCurrentUser(decoded);
+
+    const fetchPost = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/posts/${postId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setPost(res.data);
+      } catch (err) {
+        console.error('Error fetching post:', err);
+        setError(err.response?.data?.msg || 'Failed to load post');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [postId, navigate]);
+
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this post?')) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/api/posts/${postId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      navigate('/feed');
+    } catch (err) {
+      console.error('Error deleting post:', err);
+      setError(err.response?.data?.msg || 'Failed to delete post');
+    }
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  if (isLoading) return <div className="loading">Loading...</div>;
+  if (error) return <div className="error-message">{error}</div>;
+  if (!post) return <div className="error-message">Post not found</div>;
+
+  const isOwner = currentUser && String(currentUser.id) === String(post.author);
+
+  return (
+    <>
+      <Navbar />
+      <div className="post-detail-container">
+        <button className="back-button" onClick={() => navigate(-1)}>
+          ← Back
+        </button>
+        <div className="post-detail-card">
+          <div className="post-detail-header">
+            <div className="post-author">
+              <Avatar
+                firstName={post.firstName}
+                lastName={post.lastName}
+                profilePicture={post.profilePicture}
+                size="medium"
+              />
+              <div className="author-info">
+                <span className="author-name">{post.firstName} {post.lastName}</span>
+                <span className="post-date">
+                  {new Date(post.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </span>
+              </div>
+            </div>
+            {isOwner && (
+              <div className="post-actions" ref={dropdownRef}>
+                <button 
+                  className="post-menu-button"
+                  onClick={toggleDropdown}
+                >
+                  <span className="dots"></span>
+                </button>
+                {isDropdownOpen && (
+                  <div className="post-dropdown">
+                    <button
+                      className="dropdown-item"
+                      onClick={() => navigate(`/edit-post/${post._id}`)}
+                    >
+                      Edit Post
+                    </button>
+                    <button
+                      className="dropdown-item delete"
+                      onClick={handleDelete}
+                    >
+                      Delete Post
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <h1 className="post-detail-title">{post.title}</h1>
+          <p className="post-detail-content">{post.content}</p>
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default PostDetail;

@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Avatar from './Avatar';
+import useClickOutside from '../hooks/useClickOutside';
 
 function PostCard({ post, currentUser, onDelete }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  useClickOutside(dropdownRef, () => setIsDropdownOpen(false));
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -48,7 +52,7 @@ function PostCard({ post, currentUser, onDelete }) {
           </div>
         </div>
         {currentUser && (
-          <div className="post-actions">
+          <div className="post-actions" ref={dropdownRef}>
             <button
               className="post-menu-button"
               onClick={toggleDropdown}
@@ -86,8 +90,14 @@ function PostCard({ post, currentUser, onDelete }) {
           </div>
         )}
       </div>
-      <h3 className="post-title">{post.title}</h3>
-      <p className="post-content">{post.content}</p>
+      <div 
+        className="post-content-wrapper"
+        onClick={() => navigate(`/post/${post._id}`)}
+        style={{ cursor: 'pointer' }}
+      >
+        <h3 className="post-title">{post.title}</h3>
+        <p className="post-content">{post.content}</p>
+      </div>
     </div>
   );
 }

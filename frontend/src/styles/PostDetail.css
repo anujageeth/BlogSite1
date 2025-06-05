@@ -1,93 +1,89 @@
-.feed-container {
+.post-detail-container {
   max-width: 800px;
   margin: 40px auto;
-  padding: 25px;
+  padding: 0 25px;
 }
 
-.feed-title {
-  text-align: center;
+.back-button {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px 0;
+  margin-bottom: 20px;
+  transition: color 0.3s ease;
+}
+
+.back-button:hover {
   color: #ff8100;
-  margin-bottom: 25px;
-  font-size: 28px;
-  font-weight: 600;
 }
 
-.post-card {
+.post-detail-card {
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 8px 32px rgba(255, 129, 0, 0.1);
   backdrop-filter: blur(10px);
   border-radius: 20px;
   border: 1px solid rgba(255, 129, 0, 0.18);
-  padding: 20px;
-  margin-bottom: 20px;
-  transition: transform 0.3s ease;
+  padding: 30px;
 }
 
-.post-card:hover {
-  transform: translateY(-2px);
-}
-
-.post-header {
-  margin-bottom: 15px;
-  padding-bottom: 15px;
+.post-detail-header {
+  margin-bottom: 25px;
+  padding-bottom: 25px;
   border-bottom: 1px solid rgba(255, 129, 0, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
 }
 
-.post-author {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.author-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.author-name {
-  color: #ff8100;
-  font-weight: 600;
-  font-size: 16px;
-  margin-bottom: 2px;
-}
-
-.post-date {
-  color: #666;
-  font-size: 12px;
-}
-
-.post-title {
+.post-detail-title {
+  font-size: 32px;
   color: #333;
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
-.post-content-wrapper {
-  transition: opacity 0.3s ease;
-}
-
-.post-content-wrapper:hover {
-  opacity: 0.8;
-}
-
-.post-content {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  color: #333;
-  line-height: 1.6;
-  font-size: 16px;
-  margin-top: 15px;
+.post-detail-content {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #444;
+  white-space: pre-wrap;
 }
 
 .post-actions {
+  display: flex;
+  gap: 10px;
   position: relative;
+}
+
+.edit-button,
+.delete-button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.edit-button {
+  background-color: #ff8100;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #ff9500;
+}
+
+.delete-button {
+  background-color: #fff;
+  color: #ff3b30;
+  border: 1px solid #ff3b30;
+}
+
+.delete-button:hover {
+  background-color: #ff3b30;
+  color: white;
 }
 
 .post-menu-button {
@@ -100,6 +96,7 @@
   align-items: center;
   justify-content: center;
   transition: background-color 0.3s ease;
+  margin-top: 4px;
 }
 
 .post-menu-button:hover {
@@ -145,7 +142,7 @@
   animation: dropdownFade 0.2s ease;
 }
 
-.post-dropdown .dropdown-item {
+.dropdown-item {
   padding: 12px 16px;
   border: none;
   background: none;
@@ -157,37 +154,18 @@
   transition: all 0.3s ease;
 }
 
-.post-dropdown .dropdown-item:hover {
+.dropdown-item:hover {
   background-color: rgba(255, 129, 0, 0.1);
   color: #ff8100;
 }
 
-.post-dropdown .dropdown-item.delete {
+.dropdown-item.delete {
   color: #ff3b30;
 }
 
-.post-dropdown .dropdown-item.delete:hover {
+.dropdown-item.delete:hover {
   background-color: rgba(255, 59, 48, 0.1);
   color: #ff3b30;
-}
-
-.post-dropdown .dropdown-item.delete:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background-color: rgba(255, 59, 48, 0.05);
-}
-
-.post-dropdown .dropdown-item.delete:not(:disabled):active {
-  background-color: rgba(255, 59, 48, 0.2);
-}
-
-.post-dropdown .dropdown-item.report {
-  color: #ff9500;
-}
-
-.post-dropdown .dropdown-item.report:hover {
-  background-color: rgba(255, 149, 0, 0.1);
-  color: #ff9500;
 }
 
 @keyframes dropdownFade {
@@ -201,21 +179,20 @@
   }
 }
 
-/* Add responsive design */
 @media (max-width: 768px) {
-  .feed-container {
-    padding: 15px;
+  .post-detail-container {
+    padding: 0 15px;
   }
 
-  .post-card {
-    padding: 15px;
+  .post-detail-card {
+    padding: 20px;
   }
 
-  .post-title {
-    font-size: 18px;
+  .post-detail-title {
+    font-size: 24px;
   }
 
-  .post-content {
-    font-size: 14px;
+  .post-detail-content {
+    font-size: 16px;
   }
 }
