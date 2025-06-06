@@ -86,4 +86,20 @@ router.put('/update', authMiddleware, async (req, res) => {
   }
 });
 
+// Get user profile by ID
+router.get('/profile/:userId', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId)
+      .select('-password'); // Exclude password
+    
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching user profile" });
+  }
+});
+
 export default router;

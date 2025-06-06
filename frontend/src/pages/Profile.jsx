@@ -5,6 +5,7 @@ import '../styles/Profile.css';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Avatar from '../components/Avatar';
 import PostCard from '../components/PostCard';
+import { useParams } from 'react-router-dom';
 
 // Separate EditModal into its own component
 const EditModal = ({ updateData, setUpdateData, handleUpdate, error, onClose, userInfo }) => {
@@ -105,10 +106,12 @@ const EditModal = ({ updateData, setUpdateData, handleUpdate, error, onClose, us
 };
 
 function Profile() {
+  const { userId } = useParams();
   const [userInfo, setUserInfo] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
   const [updateData, setUpdateData] = useState({
     firstName: '',
     lastName: '',
@@ -119,38 +122,52 @@ function Profile() {
   });
   const [error, setError] = useState('');
 
-  const fetchUserData = useCallback(async (token) => {
-    try {
-      const decoded = JSON.parse(atob(token.split('.')[1]));
-      setUserInfo(decoded);
-      setUpdateData(prev => ({
-        ...prev,
-        firstName: decoded.firstName,
-        lastName: decoded.lastName,
-        email: decoded.email,
-        profilePicture: decoded.profilePicture
-      }));
-
-      const res = await axios.get('http://localhost:5000/api/posts/user', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setUserPosts(res.data);
-    } catch (err) {
-      console.error('Error fetching user data:', err);
-      setError('Failed to load user data');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       window.location.href = '/login';
       return;
     }
-    fetchUserData(token);
-  }, [fetchUserData]);
+
+    // Set current user from token
+    const decoded = JSON.parse(atob(token.split('.')[1]));
+    setCurrentUser(decoded);
+
+    const fetchUserData = async () => {
+      try {
+        // If viewing own profile
+        if (userId === decoded.id) {
+          setUserInfo(decoded);
+          setUpdateData(prev => ({
+            ...prev,
+            firstName: decoded.firstName,
+            lastName: decoded.lastName,
+            email: decoded.email,
+            profilePicture: decoded.profilePicture
+          }));
+        } else {
+          // If viewing another user's profile
+          const res = await axios.get(`http://localhost:5000/api/auth/profile/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setUserInfo(res.data);
+        }
+
+        // Fetch user's posts
+        const postsRes = await axios.get(`http://localhost:5000/api/posts/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUserPosts(postsRes.data);
+      } catch (err) {
+        console.error('Error fetching user data:', err);
+        setError('Failed to load user data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [userId]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -198,6 +215,9 @@ function Profile() {
 
   if (isLoading) return <div>Loading...</div>;
 
+  // Show edit button only if viewing own profile
+  const isOwnProfile = currentUser && userId === currentUser.id;
+
   return (
     <>
       <Navbar />
@@ -216,16 +236,23 @@ function Profile() {
               <p><strong>Email:</strong> {userInfo.email}</p>
             </div>
           </div>
-          <button 
-            className="edit-button"
-            onClick={() => setIsEditing(true)}
-          >
-            Edit Profile
-          </button>
+          {isOwnProfile && (
+            <button 
+              className="edit-button"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit Profile
+            </button>
+          )}
         </div>
 
         <div className="user-posts">
-          <h2>My Posts</h2>
+          <h2 className="posts-title">
+            {isOwnProfile 
+              ? "My Posts" 
+              : `${userInfo.firstName}'s Posts`
+            }
+          </h2>
           {userPosts.map(post => (
             <PostCard
               key={post._id}

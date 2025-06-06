@@ -9,7 +9,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const posts = await Post.find()
-      .populate('author', 'firstName lastName profilePicture')
+      .populate('author', '_id firstName lastName profilePicture') // Add _id explicitly
       .sort({ createdAt: -1 });
     
     // Get comments count for each post
@@ -61,7 +61,8 @@ router.get('/user', authMiddleware, async (req, res) => {
 // Get single post
 router.get('/:id', authMiddleware, async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.params.id)
+      .populate('author', '_id firstName lastName profilePicture'); // Add _id explicitly
     if (!post) {
       return res.status(404).json({ msg: "Post not found" });
     }
@@ -219,6 +220,17 @@ router.delete('/:postId/comments/:commentId', authMiddleware, async (req, res) =
   } catch (err) {
     console.error('Delete comment error:', err);
     res.status(500).json({ msg: "Error deleting comment" });
+  }
+});
+
+// Get user's posts by user ID
+router.get('/user/:userId', authMiddleware, async (req, res) => {
+  try {
+    const posts = await Post.find({ author: req.params.userId })
+      .sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching user posts" });
   }
 });
 

@@ -77,13 +77,24 @@ function PostCard({ post, currentUser, onDelete }) {
     navigate(`/post/${post._id}#comment`);
   };
 
+  const handleAuthorClick = (e) => {
+    e.stopPropagation(); // Prevent post content click
+    // Fix: Use post.author._id or post.author if it's already a string
+    const authorId = post.author._id || post.author;
+    navigate(`/profile/${authorId}`);
+  };
+
   const isOwner = String(currentUser?.id) === String(post.author);
 
   return (
     <>
       <div className="post-card">
         <div className="post-header">
-          <div className="post-author">
+          <div 
+            className="post-author" 
+            onClick={handleAuthorClick}
+            style={{ cursor: 'pointer' }}
+          >
             <Avatar
               firstName={post.firstName}
               lastName={post.lastName}

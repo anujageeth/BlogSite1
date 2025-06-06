@@ -205,6 +205,12 @@ function PostDetail() {
 
   const isOwner = currentUser && String(currentUser.id) === String(post.author);
 
+  const handleAuthorClick = () => {
+    // Fix: Use post.author._id or post.author if it's already a string
+    const authorId = post.author._id || post.author;
+    navigate(`/profile/${authorId}`);
+  };
+
   return (
     <>
       <Navbar />
@@ -230,7 +236,11 @@ function PostDetail() {
         </button>
         <div className="post-detail-card">
           <div className="post-detail-header">
-            <div className="post-author">
+            <div 
+              className="post-author" 
+              onClick={handleAuthorClick}
+              style={{ cursor: 'pointer' }}
+            >
               <Avatar
                 firstName={post.firstName}
                 lastName={post.lastName}
