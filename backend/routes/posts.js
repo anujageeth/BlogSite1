@@ -1,6 +1,7 @@
 import express from 'express';
 import Post from '../models/Post.js';
 import Comment from '../models/Comment.js';
+import Notification from '../models/Notification.js';
 import { authMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -135,6 +136,15 @@ router.post('/:id/like', authMiddleware, async (req, res) => {
     } else {
       // Like
       post.likes.push(req.user.id);
+
+      // Create notification when post is liked
+      const notification = new Notification({
+        recipient: post.author,
+        sender: req.user.id,
+        post: post._id,
+        type: 'like'
+      });
+      await notification.save();
     }
 
     await post.save();
@@ -181,6 +191,14 @@ router.get('/:id/comments', authMiddleware, async (req, res) => {
 router.post('/:id/comments', authMiddleware, async (req, res) => {
   try {
     const { content } = req.body;
+    
+    // First fetch the post
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ msg: "Post not found" });
+    }
+
+    // Create the comment
     const comment = new Comment({
       content,
       post: req.params.id,
@@ -191,8 +209,21 @@ router.post('/:id/comments', authMiddleware, async (req, res) => {
     });
     
     await comment.save();
+
+    // Create notification for post author
+    if (String(post.author) !== String(req.user.id)) {
+      const notification = new Notification({
+        recipient: post.author,
+        sender: req.user.id,
+        post: post._id,
+        type: 'comment'
+      });
+      await notification.save();
+    }
+
     res.status(201).json(comment);
   } catch (err) {
+    console.error('Error creating comment:', err);
     res.status(500).json({ msg: "Error creating comment" });
   }
 });
