@@ -148,39 +148,41 @@ router.put('/:id', authMiddleware, async (req, res) => {
 });
 
 // Like/Unlike post
-router.post('/:id/like', authMiddleware, async (req, res) => {
+router.put('/:id/like', authMiddleware, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (!post) {
-      return res.status(404).json({ msg: "Post not found" });
-    }
+    if (!post) return res.status(404).json({ msg: "Post not found" });
 
-    const likeIndex = post.likes.indexOf(req.user.id);
-    if (likeIndex > -1) {
-      // Unlike
-      post.likes.splice(likeIndex, 1);
+    // Check if post owner is liking their own post
+    const isOwnPost = post.author.toString() === req.user.id;
+
+    // Toggle like
+    const userLiked = post.likes.includes(req.user.id);
+    if (userLiked) {
+      post.likes = post.likes.filter(id => id.toString() !== req.user.id);
     } else {
-      // Like
       post.likes.push(req.user.id);
-
-      // Create notification when post is liked
-      const notification = new Notification({
-        recipient: post.author,
-        sender: req.user.id,
-        post: post._id,
-        type: 'like'
-      });
-      await notification.save();
+      
+      // Create notification only if it's not the post owner
+      if (!isOwnPost) {
+        const notification = new Notification({
+          recipient: post.author,
+          sender: req.user.id,
+          post: post._id,
+          type: 'like'
+        });
+        await notification.save();
+      }
     }
 
     await post.save();
-    res.json({ 
-      likes: post.likes.length,
-      isLiked: likeIndex === -1
+    res.json({
+      likes: post.likes,
+      isLiked: !userLiked
     });
   } catch (err) {
     console.error('Like error:', err);
-    res.status(500).json({ msg: "Error updating like" });
+    res.status(500).json({ msg: "Server error" });
   }
 });
 
@@ -216,28 +218,25 @@ router.get('/:id/comments', authMiddleware, async (req, res) => {
 // Add comment
 router.post('/:id/comments', authMiddleware, async (req, res) => {
   try {
-    const { content } = req.body;
-    
-    // First fetch the post
     const post = await Post.findById(req.params.id);
-    if (!post) {
-      return res.status(404).json({ msg: "Post not found" });
-    }
+    if (!post) return res.status(404).json({ msg: "Post not found" });
 
-    // Create the comment
+    // Check if post owner is commenting on their own post
+    const isOwnPost = post.author.toString() === req.user.id;
+
     const comment = new Comment({
-      content,
-      post: req.params.id,
+      content: req.body.content,
       author: req.user.id,
+      post: req.params.id,
       firstName: req.user.firstName,
       lastName: req.user.lastName,
       profilePicture: req.user.profilePicture
     });
-    
+
     await comment.save();
 
-    // Create notification for post author
-    if (String(post.author) !== String(req.user.id)) {
+    // Create notification only if it's not the post owner
+    if (!isOwnPost) {
       const notification = new Notification({
         recipient: post.author,
         sender: req.user.id,

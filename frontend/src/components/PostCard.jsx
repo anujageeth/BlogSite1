@@ -59,14 +59,15 @@ function PostCard({ post, currentUser, onDelete }) {
     }
 
     try {
-      const res = await axios.post(
+      const res = await axios.put(  // Changed from post to put
         `http://localhost:5000/api/posts/${post._id}/like`,
         {},
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       
-      setIsLiked(res.data.isLiked);
-      setLikeCount(res.data.likes);
+      // Update both isLiked and likeCount from response
+      setIsLiked(res.data.likes.includes(currentUser.id));
+      setLikeCount(res.data.likes.length);
     } catch (err) {
       console.error('Error updating like:', err);
     }

@@ -160,28 +160,31 @@ function Navbar() {
                   <div className="notification-list">
                     {notifications.length > 0 ? (
                       notifications.map(notification => (
-                        <div
-                          key={notification._id}
-                          className={`notification-item ${!notification.read ? 'unread' : ''}`}
-                          onClick={() => handleNotificationItemClick(notification)}
-                        >
-                          <Avatar
-                            firstName={notification.sender.firstName}
-                            lastName={notification.sender.lastName}
-                            profilePicture={notification.sender.profilePicture}
-                            size="small"
-                          />
-                          <div className="notification-content">
-                            <p>
-                              <strong>{notification.sender.firstName} {notification.sender.lastName}</strong>
-                              {notification.type === 'like' ? ' liked' : ' commented on'} your post
-                              "{notification.post.title}"
-                            </p>
-                            <span className="notification-time">
-                              {new Date(notification.createdAt).toLocaleDateString()}
-                            </span>
+                        // Only render notification if post exists
+                        notification.post ? (
+                          <div
+                            key={notification._id}
+                            className={`notification-item ${!notification.read ? 'unread' : ''}`}
+                            onClick={() => handleNotificationItemClick(notification)}
+                          >
+                            <Avatar
+                              firstName={notification.sender.firstName}
+                              lastName={notification.sender.lastName}
+                              profilePicture={notification.sender.profilePicture}
+                              size="small"
+                            />
+                            <div className="notification-content">
+                              <p>
+                                <strong>{notification.sender.firstName} {notification.sender.lastName}</strong>
+                                {notification.type === 'like' ? ' liked' : ' commented on'} your post
+                                "{notification.post.title}"
+                              </p>
+                              <span className="notification-time">
+                                {new Date(notification.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
                           </div>
-                        </div>
+                        ) : null
                       ))
                     ) : (
                       <div className="no-notifications">
