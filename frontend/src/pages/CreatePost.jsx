@@ -173,12 +173,10 @@ function CreatePost() {
 
 
       {toast.show && (
-        <div className="toast-container">
-          <Toast 
-            message={toast.message}
-            onClose={() => setToast({ show: false, message: '' })}
-          />
-        </div>
+        <Toast 
+          message={toast.message}
+          onClose={() => setToast({ show: false, message: '' })}
+        />
       )}
     </>
   );

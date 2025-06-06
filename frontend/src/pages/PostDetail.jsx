@@ -23,6 +23,7 @@ function PostDetail() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '' });
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const dropdownRef = useRef(null);
   const commentsRef = useRef(null);
   const commentInputRef = useRef(null);
@@ -119,6 +120,7 @@ function PostDetail() {
 
   const handleDelete = async () => {
     try {
+      setIsDeleting(true);
       await axios.delete(`http://localhost:5000/api/posts/${postId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
@@ -126,6 +128,8 @@ function PostDetail() {
     } catch (err) {
       console.error('Error deleting post:', err);
       setError(err.response?.data?.msg || 'Failed to delete post');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -257,7 +261,9 @@ function PostDetail() {
   if (error) return <div className="error-message">{error}</div>;
   if (!post) return <div className="error-message">Post not found</div>;
 
-  const isOwner = currentUser && String(currentUser.id) === String(post.author);
+  const isOwner = currentUser && (
+    String(currentUser.id) === String(post.author?._id || post.author)
+  );
 
   const handleAuthorClick = () => {
     // Fix: Use post.author._id or post.author if it's already a string
@@ -313,34 +319,35 @@ function PostDetail() {
               </div>
             </div>
             <div className="post-actions-wrapper">
-              <button 
-                className={`subscribe-button ${isSubscribed ? 'subscribed' : ''}`}
-                onClick={handleSubscribe}
-                disabled={currentUser?.id === post.author._id}
-                aria-label={isSubscribed ? 'Unsubscribe from author' : 'Subscribe to author'}
-              >
-                <svg 
-                  width="16" 
-                  height="16" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+              {currentUser && currentUser.id !== post.author._id && (
+                <button 
+                  className={`subscribe-button ${isSubscribed ? 'subscribed' : ''}`}
+                  onClick={handleSubscribe}
+                  aria-label={isSubscribed ? 'Unsubscribe from author' : 'Subscribe to author'}
                 >
-                  {isSubscribed ? (
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                  ) : (
-                    <>
-                      <circle cx="12" cy="12" r="10"/>
-                      <line x1="12" y1="8" x2="12" y2="16"/>
-                      <line x1="8" y1="12" x2="16" y2="12"/>
-                    </>
-                  )}
-                </svg>
-                <span>{isSubscribed ? 'Plugged in' : 'Plug in'}</span>
-              </button>
+                  <svg 
+                    width="16" 
+                    height="16" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    {isSubscribed ? (
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    ) : (
+                      <>
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="16"/>
+                        <line x1="8" y1="12" x2="16" y2="12"/>
+                      </>
+                    )}
+                  </svg>
+                  <span>{isSubscribed ? 'Plugged in' : 'Plug in'}</span>
+                </button>
+              )}
               {currentUser && (
                 <div className="post-actions" ref={dropdownRef}>
                   <button 
@@ -389,6 +396,7 @@ function PostDetail() {
                               setIsDropdownOpen(false);
                               setShowConfirmDialog(true);
                             }}
+                            disabled={isDeleting}
                           >
                             <svg 
                               viewBox="0 0 24 24" 
@@ -403,7 +411,7 @@ function PostDetail() {
                               <polyline points="3 6 5 6 21 6" />
                               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                             </svg>
-                            Delete Post
+                            {isDeleting ? 'Deleting...' : 'Delete Post'}
                           </button>
                         </>
                       ) : (
