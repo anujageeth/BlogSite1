@@ -391,17 +391,52 @@
   transform: translateY(1px);
 }
 
-/* Update icon sizes to match */
-.create-post-button svg,
-.notification-button svg {
-  width: 20px;
-  height: 20px;
-  stroke-width: 2px;
+/* Update the search button styles */
+.search-button {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: #666;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Remove any individual button styles that might conflict */
-.create-post-button {
-  margin-right: 4px; /* Add slight spacing between icons */
+.search-button svg {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-button:hover {
+  background: rgba(255, 129, 0, 0.1);
+  color: #ff8100;
+  transform: translateY(-1px);
+}
+
+.search-button:hover svg {
+  animation: searchZoomRotate 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-button:active {
+  transform: translateY(1px);
+}
+
+/* Add the search animation keyframes */
+@keyframes searchZoomRotate {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(-15deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
 }
 
 @keyframes dropdownFade {

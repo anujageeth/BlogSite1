@@ -2,11 +2,12 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
-import { authMiddleware } from '../middleware/auth.js';  // Fix the import path
 import Post from '../models/Post.js';
 import Comment from '../models/Comment.js';
+import Notification from '../models/Notification.js';
 import upload from '../middleware/upload.js';
 import cloudinary from '../config/cloudinary.js';
+import { authMiddleware } from '../middleware/auth.js';  // Add this import
 
 const router = express.Router();
 
@@ -171,28 +172,35 @@ router.post('/upload-avatar', authMiddleware, upload.single('image'), async (req
       resource_type: 'auto'
     });
 
-    // Update user in database
-    await User.findByIdAndUpdate(req.user.id, {
-      profilePicture: uploadResponse.secure_url
-    });
+    // Handle notifications update with try-catch
+    try {
+      // Update user in database
+      await User.findByIdAndUpdate(req.user.id, {
+        profilePicture: uploadResponse.secure_url
+      });
 
-    // Update all posts
-    await Post.updateMany(
-      { author: req.user.id },
-      { profilePicture: uploadResponse.secure_url }
-    );
+      // Update all posts
+      await Post.updateMany(
+        { author: req.user.id },
+        { profilePicture: uploadResponse.secure_url }
+      );
 
-    // Update all comments
-    await Comment.updateMany(
-      { author: req.user.id },
-      { profilePicture: uploadResponse.secure_url }
-    );
+      // Update all comments
+      await Comment.updateMany(
+        { author: req.user.id },
+        { profilePicture: uploadResponse.secure_url }
+      );
 
-    // Update all notifications
-    await Notification.updateMany(
-      { 'sender._id': req.user.id },
-      { 'sender.profilePicture': uploadResponse.secure_url }
-    );
+      // Update all notifications (wrap in try-catch in case Notification collection doesn't exist)
+      await Notification.updateMany(
+        { 'sender._id': req.user.id },
+        { 'sender.profilePicture': uploadResponse.secure_url }
+      );
+
+    } catch (updateErr) {
+      console.error('Error updating references:', updateErr);
+      // Continue execution even if updating references fails
+    }
 
     res.json({ imageUrl: uploadResponse.secure_url });
   } catch (err) {

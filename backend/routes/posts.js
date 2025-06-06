@@ -85,6 +85,56 @@ router.get('/user', authMiddleware, async (req, res) => {
   }
 });
 
+// Update the search route
+router.get('/search', authMiddleware, async (req, res) => {
+  try {
+    const { q: searchTerm, searchIn = 'all', from, to } = req.query;
+    
+    if (!searchTerm) {
+      return res.json([]);
+    }
+
+    let searchQuery = {};
+
+    // Handle search scope
+    if (searchIn === 'all') {
+      searchQuery.$or = [
+        { title: { $regex: searchTerm, $options: 'i' } },
+        { content: { $regex: searchTerm, $options: 'i' } }
+      ];
+    } else if (searchIn === 'title') {
+      searchQuery.title = { $regex: searchTerm, $options: 'i' };
+    } else if (searchIn === 'content') {
+      searchQuery.content = { $regex: searchTerm, $options: 'i' };
+    }
+
+    // Handle date range
+    if (from || to) {
+      searchQuery.createdAt = {};
+      if (from) searchQuery.createdAt.$gte = new Date(from);
+      if (to) searchQuery.createdAt.$lte = new Date(to + 'T23:59:59');
+    }
+
+    const posts = await Post.find(searchQuery)
+      .populate('author', 'firstName lastName profilePicture')
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    const postsWithCounts = await Promise.all(posts.map(async post => {
+      const commentsCount = await Comment.countDocuments({ post: post._id });
+      return {
+        ...post.toObject(),
+        comments: commentsCount
+      };
+    }));
+
+    res.json(postsWithCounts);
+  } catch (err) {
+    console.error('Search error:', err);
+    res.status(500).json({ msg: "Error searching posts" });
+  }
+});
+
 // Get single post
 router.get('/:id', authMiddleware, async (req, res) => {
   try {

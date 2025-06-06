@@ -85,7 +85,9 @@ function PostCard({ post, currentUser, onDelete }) {
     navigate(`/profile/${authorId}`);
   };
 
-  const isOwner = String(currentUser?.id) === String(post.author);
+  const isOwner = currentUser && (
+    String(currentUser.id) === String(post.author._id || post.author)
+  );
 
   return (
     <>
@@ -143,11 +145,20 @@ function PostCard({ post, currentUser, onDelete }) {
             </div>
             {currentUser && (
               <div className="post-actions" ref={dropdownRef}>
-                <button
+                <button 
                   className="post-menu-button"
                   onClick={toggleDropdown}
+                  aria-label="Post menu"
                 >
-                  <span className="dots"></span>
+                  <svg 
+                    viewBox="0 0 24 24" 
+                    width="24"
+                    height="24"
+                  >
+                    <circle cx="12" cy="6" r="2.5" fill="currentColor"/>
+                    <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+                    <circle cx="12" cy="18" r="2.5" fill="currentColor"/>
+                  </svg>
                 </button>
                 {isDropdownOpen && (
                   <div className="post-dropdown">
@@ -155,20 +166,63 @@ function PostCard({ post, currentUser, onDelete }) {
                       <>
                         <button
                           className="dropdown-item"
-                          onClick={() => navigate(`/edit-post/${post._id}`)}
+                          onClick={() => {
+                            setIsDropdownOpen(false);
+                            navigate(`/edit-post/${post._id}`);
+                          }}
                         >
+                          <svg 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            width="16"
+                            height="16"
+                          >
+                            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                          </svg>
                           Edit Post
                         </button>
                         <button
                           className="dropdown-item delete"
-                          onClick={() => setShowConfirmDialog(true)}
+                          onClick={() => {
+                            setIsDropdownOpen(false);
+                            setShowConfirmDialog(true);
+                          }}
                           disabled={isDeleting}
                         >
+                          <svg 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            width="16"
+                            height="16"
+                          >
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          </svg>
                           {isDeleting ? 'Deleting...' : 'Delete Post'}
                         </button>
                       </>
                     ) : (
                       <button className="dropdown-item report">
+                        <svg 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          width="16"
+                          height="16"
+                        >
+                          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
                         Report Post
                       </button>
                     )}

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Avatar from './Avatar';
+import Search from './Search';
 import '../styles/NavBar.css';
 
 function Navbar() {
@@ -10,6 +11,7 @@ function Navbar() {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const dropdownRef = useRef(null);
   const notificationRef = useRef(null);
   const navigate = useNavigate();
@@ -112,6 +114,25 @@ function Navbar() {
         </div>
         {userInfo ? (
           <div className="nav-actions">
+            <button 
+              className="search-button"
+              onClick={() => setIsSearchOpen(true)}
+              data-tooltip="Search"
+            >
+              <svg 
+                width="20" 
+                height="20" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </button>
             <button 
               className="create-post-button welcome-create-button"
               onClick={() => navigate('/create')}
@@ -233,6 +254,7 @@ function Navbar() {
           <Link to="/login" className="nav-link">Login</Link>
         )}
       </nav>
+      <Search isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 }
