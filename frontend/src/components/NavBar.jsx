@@ -186,8 +186,11 @@ function Navbar() {
                             <div className="notification-content">
                               <p>
                                 <strong>{notification.sender.firstName} {notification.sender.lastName}</strong>
-                                {notification.type === 'like' ? ' liked' : ' commented on'} your post
-                                "{notification.post.title}"
+                                {notification.type === 'like' && ' liked your post '}
+                                {notification.type === 'comment' && ' commented on your post '}
+                                {notification.type === 'subscribe' && ' subscribed to your posts'}
+                                {notification.type === 'post_created' && ' published a new post: '}
+                                {notification.post && `"${notification.post.title}"`}
                               </p>
                               <span className="notification-time">
                                 {new Date(notification.createdAt).toLocaleDateString()}

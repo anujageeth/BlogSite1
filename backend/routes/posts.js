@@ -68,6 +68,28 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
     });
 
     await post.save();
+
+    // Notify subscribers
+    try {
+      // Get current user's subscribers
+      const currentUser = await User.findById(req.user.id);
+      
+      // Create notifications for all subscribers
+      const notifications = currentUser.subscribers.map(subscriberId => ({
+        recipient: subscriberId,
+        sender: req.user.id,
+        post: post._id,
+        type: 'post_created'
+      }));
+
+      if (notifications.length > 0) {
+        await Notification.insertMany(notifications);
+      }
+    } catch (notifErr) {
+      console.error('Error creating subscriber notifications:', notifErr);
+      // Continue even if notification creation fails
+    }
+
     res.status(201).json(post);
   } catch (err) {
     console.error('Post creation error:', err);
