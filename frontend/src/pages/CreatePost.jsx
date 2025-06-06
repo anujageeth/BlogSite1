@@ -37,6 +37,7 @@ function CreatePost() {
     }
   };
 
+  // Update the submitPost function
   const submitPost = async () => {
     if (!title.trim() || !content.trim()) {
       alert('Please fill in all fields');
@@ -52,15 +53,16 @@ function CreatePost() {
         formData.append('image', image);
       }
 
-      await axios.post('http://localhost:5000/api/posts', formData, {
+      const response = await axios.post('http://localhost:5000/api/posts', formData, {
         headers: { 
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'multipart/form-data'
         }
       });
+      
       setToast({ show: true, message: 'Post created successfully!' });
       setTimeout(() => {
-        navigate('/feed');
+        navigate(`/post/${response.data._id}`); // Navigate to the new post
       }, 1000);
     } catch (err) {
       console.error('Error creating post:', err);
@@ -89,33 +91,36 @@ function CreatePost() {
           required 
         />
         <div className="image-upload-container">
-          <input
-            type="file"
-            id="image-upload"
-            className="image-upload-input"
-            accept="image/*"
-            onChange={handleImageChange}
-          />
-          <label htmlFor="image-upload" className="image-upload-label">
-            <svg 
-              width="24" 
-              height="24" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7" />
-              <line x1="16" y1="5" x2="22" y2="5" />
-              <line x1="19" y1="2" x2="19" y2="8" />
-              <circle cx="9" cy="9" r="2" />
-              <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-            </svg>
-            Add Image
-          </label>
-          {imagePreview && (
+          {!imagePreview ? (
+            <>
+              <input
+                type="file"
+                id="image-upload"
+                className="image-upload-input"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+              <label htmlFor="image-upload" className="image-upload-label">
+                <svg 
+                  width="24" 
+                  height="24" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7" />
+                  <line x1="16" y1="5" x2="22" y2="5" />
+                  <line x1="19" y1="2" x2="19" y2="8" />
+                  <circle cx="9" cy="9" r="2" />
+                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                </svg>
+                Add Image
+              </label>
+            </>
+          ) : (
             <div className="image-preview-container">
               <img src={imagePreview} alt="Preview" className="image-preview" />
               <button 

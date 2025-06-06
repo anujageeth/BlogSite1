@@ -39,6 +39,7 @@ function EditPost() {
     fetchPost();
   }, [postId, navigate]);
 
+  // Update the handleSubmit function
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -50,7 +51,7 @@ function EditPost() {
       );
       setToast({ show: true, message: 'Post updated successfully!' });
       setTimeout(() => {
-        navigate('/feed');
+        navigate(`/post/${postId}`); // Navigate to the updated post
       }, 1000);
     } catch (err) {
       console.error('Error updating post:', err);
