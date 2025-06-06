@@ -3,6 +3,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { authMiddleware } from '../middleware/auth.js';  // Fix the import path
+import Post from '../models/Post.js';
+import Comment from '../models/Comment.js';
 
 const router = express.Router();
 
@@ -54,6 +56,9 @@ router.put('/update', authMiddleware, async (req, res) => {
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) return res.status(400).json({ msg: "Current password is incorrect" });
 
+    // Check if name is being updated
+    const isNameChanged = user.firstName !== firstName || user.lastName !== lastName;
+
     // Update user details
     user.firstName = firstName;
     user.lastName = lastName;
@@ -69,6 +74,29 @@ router.put('/update', authMiddleware, async (req, res) => {
 
     await user.save();
 
+    // If name changed, update posts and comments
+    if (isNameChanged) {
+      // Update all posts by this user
+      await Post.updateMany(
+        { author: user._id },
+        { 
+          firstName: firstName,
+          lastName: lastName,
+          profilePicture: profilePicture || user.profilePicture
+        }
+      );
+
+      // Update all comments by this user
+      await Comment.updateMany(
+        { author: user._id },
+        { 
+          firstName: firstName,
+          lastName: lastName,
+          profilePicture: profilePicture || user.profilePicture
+        }
+      );
+    }
+
     // Generate new token with updated info
     const token = jwt.sign({ 
       id: user._id, 
@@ -82,6 +110,7 @@ router.put('/update', authMiddleware, async (req, res) => {
 
     res.json({ token, msg: "Profile updated successfully" });
   } catch (err) {
+    console.error('Update error:', err);
     res.status(500).json({ msg: "Server error" });
   }
 });
