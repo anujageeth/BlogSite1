@@ -24,6 +24,7 @@ function Search({ isOpen, onClose, userId }) {
     }
   }, [isOpen]);
 
+  // Update the useEffect with handleSearch function
   useEffect(() => {
     const handleSearch = async () => {
       if (searchTerm.trim()) {
@@ -35,7 +36,7 @@ function Search({ isOpen, onClose, userId }) {
             searchIn,
             ...(dateRange.from && { from: dateRange.from }),
             ...(dateRange.to && { to: dateRange.to }),
-            ...(userId && { userId }) // Add userId to params if it exists
+            ...(userId && { userId })
           });
 
           const res = await axios.get(
@@ -45,7 +46,11 @@ function Search({ isOpen, onClose, userId }) {
             }
           );
           
-          setSearchResults({ posts: res.data, users: [] });
+          if (searchIn === 'users') {
+            setSearchResults({ posts: [], users: res.data });
+          } else {
+            setSearchResults({ posts: res.data, users: [] });
+          }
         } catch (err) {
           console.error('Search error:', err);
           setSearchResults({ posts: [], users: [] });
@@ -114,7 +119,7 @@ function Search({ isOpen, onClose, userId }) {
                     className={`filter-button ${searchIn === 'all' ? 'active' : ''}`}
                     onClick={() => setSearchIn('all')}
                   >
-                    All
+                    Posts
                   </button>
                   <button 
                     className={`filter-button ${searchIn === 'title' ? 'active' : ''}`}
@@ -167,13 +172,16 @@ function Search({ isOpen, onClose, userId }) {
             <div className="search-results">
               {isLoading ? (
                 <div className="search-message">Searching...</div>
-              ) : searchIn === 'users' ? (
+              ) : searchIn === 'users' && !userId ? (
                 searchResults.users.length > 0 ? (
                   searchResults.users.map(user => (
                     <div 
                       key={user._id} 
                       className="search-result-item user-result"
-                      onClick={() => navigate(`/profile/${user._id}`)}
+                      onClick={() => {
+                        navigate(`/profile/${user._id}`);
+                        onClose();
+                      }}
                     >
                       <div className="result-author">
                         <Avatar
@@ -208,14 +216,14 @@ function Search({ isOpen, onClose, userId }) {
                     >
                       <div className="result-author">
                         <Avatar
-                          firstName={post.firstName}
-                          lastName={post.lastName}
-                          profilePicture={post.profilePicture}
+                          firstName={post.author?.firstName || post.firstName}
+                          lastName={post.author?.lastName || post.lastName}
+                          profilePicture={post.author?.profilePicture || post.profilePicture}
                           size="small"
                         />
                         <div className="result-author-info">
                           <span className="author-name">
-                            {post.firstName} {post.lastName}
+                            {post.author?.firstName || post.firstName} {post.author?.lastName || post.lastName}
                           </span>
                           <span className="post-date">
                             {new Date(post.createdAt).toLocaleDateString()}
@@ -224,7 +232,7 @@ function Search({ isOpen, onClose, userId }) {
                       </div>
                       <h3 className="result-title">{post.title}</h3>
                       <p className="result-preview">
-                        {post.content.substring(0, 100)}...
+                        {post.content?.substring(0, 100) || ''}...
                       </p>
                     </div>
                   ))

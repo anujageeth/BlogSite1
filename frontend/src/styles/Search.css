@@ -173,7 +173,6 @@
 
 .filter-buttons {
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -202,7 +201,8 @@
 .date-inputs {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  flex: 1;
 }
 
 .date-input {
@@ -223,6 +223,7 @@
 .date-separator {
   color: #666;
   font-size: 14px;
+  font-weight: 500;
 }
 
 @keyframes fadeIn {
@@ -258,33 +259,10 @@
 
   .date-inputs {
     width: 100%;
+    gap: 8px;
   }
 
   .date-input {
     flex: 1;
   }
-
-  .filter-buttons {
-    width: 100%;
-  }
-  
-  .filter-button {
-    flex: 1;
-    text-align: center;
-    min-width: calc(50% - 4px);
-  }
-}
-
-.user-result {
-  display: flex;
-  align-items: center;
-}
-
-.user-result .result-author {
-  margin-bottom: 0;
-}
-
-.user-email {
-  color: #666;
-  font-size: 13px;
 }

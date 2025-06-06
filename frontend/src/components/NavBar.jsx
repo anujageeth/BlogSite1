@@ -37,26 +37,33 @@ function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await axios.get('http://localhost:5000/api/notifications', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
-        setNotifications(res.data.notifications);
-        setUnreadCount(res.data.unreadCount);
-      } catch (err) {
-        console.error('Error fetching notifications:', err);
-      }
-    };
+  // Update the fetchNotifications function
+  const fetchNotifications = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
 
+    try {
+      const res = await axios.get('http://localhost:5000/api/notifications', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // The response now includes both notifications and unreadCount
+      const { notifications, unreadCount } = res.data;
+      setNotifications(notifications);
+      setUnreadCount(unreadCount);
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  };
+
+  // Update the useEffect for notifications polling
+  useEffect(() => {
     if (userInfo) {
       fetchNotifications();
-      // Poll for new notifications every 30 seconds
-      const interval = setInterval(fetchNotifications, 30000);
+      const interval = setInterval(fetchNotifications, 30000); // Poll every 30 seconds
       return () => clearInterval(interval);
     }
-  }, [userInfo]);
+  }, [userInfo]); // Add userInfo as dependency
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -133,25 +140,7 @@ function Navbar() {
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </button>
-            <button 
-              className="create-post-button welcome-create-button"
-              onClick={() => navigate('/create')}
-              data-tooltip="Create Post"
-            >
-              <svg 
-                width="20" 
-                height="20" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-            </button>
+            
             <div className="notification-wrapper" ref={notificationRef}>
               <button 
                 className="notification-button"
@@ -216,6 +205,27 @@ function Navbar() {
                 </div>
               )}
             </div>
+
+            <button 
+              className="create-post-button welcome-create-button"
+              onClick={() => navigate('/create')}
+              data-tooltip="Create Post"
+            >
+              <svg 
+                width="20" 
+                height="20" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </button>
+            
             <div className="user-menu" ref={dropdownRef}>
               <div 
                 className="user-info" 

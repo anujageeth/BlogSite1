@@ -17,22 +17,27 @@ function PostCard({ post, currentUser, onDelete }) {
 
   useClickOutside(dropdownRef, () => setIsDropdownOpen(false));
 
-  useEffect(() => {
-    const fetchLikes = async () => {
-      if (!currentUser) return;
-      
-      try {
-        const res = await axios.get(`http://localhost:5000/api/posts/${post._id}/likes`, {
+  // Update the fetchLikes function
+  const fetchLikes = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/posts/${post._id}/likes`,
+        {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
-        setIsLiked(res.data.isLiked);
-        setLikeCount(res.data.likes);
-      } catch (err) {
-        console.error('Error fetching likes:', err);
-      }
-    };
+        }
+      );
+      setLikeCount(res.data.likes);
+      setIsLiked(res.data.isLiked);
+    } catch (err) {
+      console.error('Error fetching likes:', err);
+    }
+  };
 
-    fetchLikes();
+  // Update useEffect to check for currentUser
+  useEffect(() => {
+    if (currentUser) {
+      fetchLikes();
+    }
   }, [post._id, currentUser]);
 
   const toggleDropdown = () => {
