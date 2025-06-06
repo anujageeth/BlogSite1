@@ -185,8 +185,10 @@
   backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* Change from center to flex-start */
   z-index: 1000;
+  padding: 20px; /* Add padding */
+  overflow-y: auto; /* Add scroll to overlay */
 }
 
 .modal-content {
@@ -201,12 +203,38 @@
   position: relative;
   animation: modalFade 0.3s ease;
   box-sizing: border-box;
+  margin: auto; /* Add margin auto */
+  max-height: min(90vh, 800px); /* Add max-height */
+  overflow-y: auto; /* Make content scrollable */
 }
 
+/* Add smooth scrolling to modal content */
+.modal-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 129, 0, 0.5) rgba(255, 129, 0, 0.1);
+}
+
+/* Style scrollbar for webkit browsers */
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: rgba(255, 129, 0, 0.1);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 129, 0, 0.5);
+  border-radius: 4px;
+  border: 2px solid rgba(255, 129, 0, 0.1);
+}
+
+/* Update modal animation */
 @keyframes modalFade {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -370,4 +398,55 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
+}
+
+/* Update the about section styles */
+.about-section {
+  margin: 20px 0;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 129, 0, 0.1);
+}
+
+.about-heading {
+  color: #ff8100;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+}
+
+.about-text {
+  margin: 0;
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 15px;
+}
+
+.about-text.empty {
+  color: #999;
+  font-style: italic;
+}
+
+/* Update the edit input styles for about */
+.edit-input.about-input {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.6;
+  font-family: inherit;
+  font-size: 15px;
+  padding: 15px;
+}
+
+@media (max-width: 768px) {
+  .about-section {
+    margin: 15px 0;
+    padding: 12px;
+  }
+  
+  .about-text {
+    font-size: 14px;
+  }
 }

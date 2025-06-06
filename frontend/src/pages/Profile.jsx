@@ -143,6 +143,13 @@ const EditModal = ({ updateData, setUpdateData, handleUpdate, error, onClose, us
             onChange={(e) => setUpdateData(prev => ({...prev, confirmNewPassword: e.target.value}))}
             placeholder="Confirm New Password"
           />
+          <textarea
+            className="edit-input about-input"
+            value={updateData.about}
+            onChange={(e) => setUpdateData(prev => ({...prev, about: e.target.value}))}
+            placeholder="About me"
+            rows={4}
+          />
           {error && <div className="error-message">{error}</div>}
           <div className="button-group">
             <button type="submit" className="save-button">Save Changes</button>
@@ -173,7 +180,8 @@ function Profile() {
     email: '',
     currentPassword: '',
     newPassword: '',
-    confirmNewPassword: ''
+    confirmNewPassword: '',
+    about: '' // Add this field
   });
   const [error, setError] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -207,7 +215,8 @@ function Profile() {
             firstName: decoded.firstName,
             lastName: decoded.lastName,
             email: decoded.email,
-            profilePicture: decoded.profilePicture
+            profilePicture: decoded.profilePicture,
+            about: decoded.about || '' // Add this line
           }));
         } else {
           // If viewing another user's profile
@@ -351,6 +360,14 @@ function Profile() {
                 <h2 className="profile-title">Profile</h2>
                 <p><strong>Name:</strong> {userInfo.firstName} {userInfo.lastName}</p>
                 <p><strong>Email:</strong> {userInfo.email}</p>
+                <div className="about-section">
+                  <h3 className="about-heading">About</h3>
+                  {userInfo.about ? (
+                    <p className="about-text">{userInfo.about}</p>
+                  ) : (
+                    <p className="about-text empty">No description provided</p>
+                  )}
+                </div>
                 <p className="subscriber-count">
                   <strong>Plugged ins:</strong> {subscriberCount}
                 </p>

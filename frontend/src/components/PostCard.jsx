@@ -106,10 +106,11 @@ function PostCard({ post, currentUser, onDelete }) {
   };
 
   const handleAuthorClick = (e) => {
-    e.stopPropagation(); // Prevent post content click
-    // Fix: Use post.author._id or post.author if it's already a string
-    const authorId = post.author._id || post.author;
-    navigate(`/profile/${authorId}`);
+    e.stopPropagation();
+    const authorId = post.author?._id || post.author;
+    if (authorId) {
+      navigate(`/profile/${authorId}`);
+    }
   };
 
   const handleSubscribe = async (e) => {
@@ -142,7 +143,7 @@ function PostCard({ post, currentUser, onDelete }) {
   };
 
   const isOwner = currentUser && (
-    String(currentUser.id) === String(post.author._id || post.author)
+    String(currentUser.id) === String(post.author?._id || post.author)
   );
 
   return (
@@ -155,13 +156,15 @@ function PostCard({ post, currentUser, onDelete }) {
             style={{ cursor: 'pointer' }}
           >
             <Avatar
-              firstName={post.firstName}
-              lastName={post.lastName}
-              profilePicture={post.profilePicture} // Make sure this is passed
+              firstName={post.author?.firstName || post.firstName}
+              lastName={post.author?.lastName || post.lastName}
+              profilePicture={post.author?.profilePicture || post.profilePicture}
               size="small"
             />
             <div className="author-info">
-              <span className="author-name">{post.firstName} {post.lastName}</span>
+              <span className="author-name">
+                {post.author?.firstName || post.firstName} {post.author?.lastName || post.lastName}
+              </span>
               <span className="post-date">
                 {new Date(post.createdAt).toLocaleDateString()}
               </span>

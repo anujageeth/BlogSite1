@@ -13,14 +13,29 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const posts = await Post.find()
-      .populate('author', '_id firstName lastName profilePicture') // Add _id explicitly
+      .populate({
+        path: 'author',
+        select: '_id firstName lastName profilePicture'
+      })
       .sort({ createdAt: -1 });
     
     // Get comments count for each post
     const postsWithCounts = await Promise.all(posts.map(async post => {
       const commentsCount = await Comment.countDocuments({ post: post._id });
+      const postObj = post.toObject();
+      
+      // Ensure author data is available
+      if (!postObj.author) {
+        postObj.author = {
+          _id: postObj.author || post._id,
+          firstName: postObj.firstName,
+          lastName: postObj.lastName,
+          profilePicture: postObj.profilePicture
+        };
+      }
+
       return {
-        ...post.toObject(),
+        ...postObj,
         likes: post.likes?.length || 0,
         comments: commentsCount
       };
@@ -28,6 +43,7 @@ router.get('/', async (req, res) => {
     
     res.json(postsWithCounts);
   } catch (err) {
+    console.error('Error fetching posts:', err);
     res.status(500).json({ msg: "Error fetching posts" });
   }
 });
@@ -207,8 +223,13 @@ router.delete('/:id', authMiddleware, async (req, res) => {
       return res.status(403).json({ msg: "Not authorized to delete this post" });
     }
 
+    // Delete all comments associated with the post
+    await Comment.deleteMany({ post: post._id });
+
+    // Delete the post
     await post.deleteOne();
-    res.json({ msg: "Post deleted successfully" });
+
+    res.json({ msg: "Post and associated comments deleted successfully" });
   } catch (err) {
     console.error('Delete error:', err);
     res.status(500).json({ msg: "Error deleting post" });

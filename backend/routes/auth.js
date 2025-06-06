@@ -49,8 +49,9 @@ router.post('/login', async (req, res) => {
   res.json({ token });
 });
 
+// Update the update route
 router.put('/update', authMiddleware, async (req, res) => {
-  const { firstName, lastName, email, currentPassword, newPassword, profilePicture } = req.body;
+  const { firstName, lastName, email, currentPassword, newPassword, profilePicture, about } = req.body;
   
   try {
     const user = await User.findById(req.user.id);
@@ -66,6 +67,7 @@ router.put('/update', authMiddleware, async (req, res) => {
     user.firstName = firstName;
     user.lastName = lastName;
     user.email = email;
+    user.about = about; // Add this line
     if (profilePicture) {
       user.profilePicture = profilePicture;
     }
@@ -289,6 +291,46 @@ router.get('/subscribe/:userId', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error('Subscription status error:', err);
     res.status(500).json({ msg: "Error getting subscription status" });
+  }
+});
+
+// Add after other routes, before export
+router.delete('/delete-account', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Delete all posts and their associated comments
+    const userPosts = await Post.find({ author: userId });
+    for (const post of userPosts) {
+      // Delete comments for each post
+      await Comment.deleteMany({ post: post._id });
+    }
+    await Post.deleteMany({ author: userId });
+
+    // Delete all comments made by the user on other posts
+    await Comment.deleteMany({ author: userId });
+
+    // Delete all notifications where user is sender or recipient
+    await Notification.deleteMany({
+      $or: [
+        { 'sender._id': userId },
+        { recipient: userId }
+      ]
+    });
+
+    // Remove user from other users' subscribers arrays
+    await User.updateMany(
+      { subscribers: userId },
+      { $pull: { subscribers: userId } }
+    );
+
+    // Finally, delete the user
+    await User.findByIdAndDelete(userId);
+
+    res.json({ msg: "Account deleted successfully" });
+  } catch (err) {
+    console.error('Delete account error:', err);
+    res.status(500).json({ msg: "Error deleting account" });
   }
 });
 
