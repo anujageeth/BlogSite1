@@ -214,3 +214,66 @@
   cursor: not-allowed;
   background: rgba(255, 129, 0, 0.05);
 }
+
+.posts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 30px 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 129, 0, 0.1);
+}
+
+.posts-title {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.search-capsule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 129, 0, 0.2);
+  padding: 8px 16px;
+  cursor: pointer;
+  color: #666;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.search-capsule svg {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-capsule:hover {
+  background: rgba(255, 129, 0, 0.1);
+  color: #ff8100;
+  border-color: #ff8100;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(255, 129, 0, 0.1);
+}
+
+.search-capsule:hover svg {
+  animation: searchZoomRotate 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-capsule:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+@keyframes searchZoomRotate {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(-15deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}

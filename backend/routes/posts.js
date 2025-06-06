@@ -5,6 +5,7 @@ import Notification from '../models/Notification.js';
 import cloudinary from '../config/cloudinary.js';
 import upload from '../middleware/upload.js';
 import { authMiddleware } from '../middleware/auth.js';
+import User from '../models/User.js'; // Import User model
 
 const router = express.Router();
 
@@ -85,16 +86,37 @@ router.get('/user', authMiddleware, async (req, res) => {
   }
 });
 
-// Update the search route
+// Update the search route to handle userId
 router.get('/search', authMiddleware, async (req, res) => {
   try {
-    const { q: searchTerm, searchIn = 'all', from, to } = req.query;
+    const { q: searchTerm, searchIn = 'all', from, to, userId } = req.query;
     
     if (!searchTerm) {
       return res.json([]);
     }
 
+    // If searching for users and no userId is provided
+    if (searchIn === 'users' && !userId) {
+      const users = await User.find({
+        $or: [
+          { firstName: { $regex: searchTerm, $options: 'i' } },
+          { lastName: { $regex: searchTerm, $options: 'i' } },
+          { email: { $regex: searchTerm, $options: 'i' } }
+        ]
+      })
+      .select('firstName lastName email profilePicture')
+      .limit(10);
+      
+      return res.json(users);
+    }
+
+    // Build search query
     let searchQuery = {};
+
+    // Add user filter if userId is provided
+    if (userId) {
+      searchQuery.author = userId;
+    }
 
     // Handle search scope
     if (searchIn === 'all') {
@@ -131,7 +153,7 @@ router.get('/search', authMiddleware, async (req, res) => {
     res.json(postsWithCounts);
   } catch (err) {
     console.error('Search error:', err);
-    res.status(500).json({ msg: "Error searching posts" });
+    res.status(500).json({ msg: "Error searching" });
   }
 });
 

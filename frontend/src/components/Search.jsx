@@ -4,9 +4,10 @@ import axios from 'axios';
 import Avatar from './Avatar';
 import '../styles/Search.css';
 
-function Search({ isOpen, onClose }) {
+// Update the props to include userId
+function Search({ isOpen, onClose, userId }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState({ posts: [], users: [] });
   const [isLoading, setIsLoading] = useState(false);
   const [searchIn, setSearchIn] = useState('all');
   const [dateRange, setDateRange] = useState({
@@ -33,7 +34,8 @@ function Search({ isOpen, onClose }) {
             q: searchTerm,
             searchIn,
             ...(dateRange.from && { from: dateRange.from }),
-            ...(dateRange.to && { to: dateRange.to })
+            ...(dateRange.to && { to: dateRange.to }),
+            ...(userId && { userId }) // Add userId to params if it exists
           });
 
           const res = await axios.get(
@@ -42,27 +44,29 @@ function Search({ isOpen, onClose }) {
               headers: { Authorization: `Bearer ${token}` }
             }
           );
-          setSearchResults(res.data);
+          
+          setSearchResults({ posts: res.data, users: [] });
         } catch (err) {
           console.error('Search error:', err);
-          setSearchResults([]);
+          setSearchResults({ posts: [], users: [] });
         } finally {
           setIsLoading(false);
         }
       } else {
-        setSearchResults([]);
+        setSearchResults({ posts: [], users: [] });
       }
     };
 
     const debounceTimer = setTimeout(handleSearch, 300);
     return () => clearTimeout(debounceTimer);
-  }, [searchTerm, searchIn, dateRange]);
+  }, [searchTerm, searchIn, dateRange, userId]);
 
   const handleResultClick = (postId) => {
     navigate(`/post/${postId}`);
     onClose();
   };
 
+  // Update the filter buttons to hide users option when userId is provided
   return (
     <>
       {isOpen && (
@@ -122,69 +126,113 @@ function Search({ isOpen, onClose }) {
                     className={`filter-button ${searchIn === 'content' ? 'active' : ''}`}
                     onClick={() => setSearchIn('content')}
                   >
-                    Contents
+                    Content
                   </button>
+                  {/* Remove users button when userId is provided */}
+                  {!userId && (
+                    <button 
+                      className={`filter-button ${searchIn === 'users' ? 'active' : ''}`}
+                      onClick={() => setSearchIn('users')}
+                    >
+                      Users
+                    </button>
+                  )}
                 </div>
               </div>
               
-              <div className="filter-group">
-                <span className="filter-label">Date range:</span>
-                <div className="date-inputs">
-                  <input
-                    type="date"
-                    value={dateRange.from}
-                    onChange={(e) => setDateRange(prev => ({ ...prev, from: e.target.value }))}
-                    className="date-input"
-                    max={dateRange.to || undefined}
-                  />
-                  <span className="date-separator">to</span>
-                  <input
-                    type="date"
-                    value={dateRange.to}
-                    onChange={(e) => setDateRange(prev => ({ ...prev, to: e.target.value }))}
-                    className="date-input"
-                    min={dateRange.from || undefined}
-                  />
+              {searchIn !== 'users' && (
+                <div className="filter-group">
+                  <span className="filter-label">Date range:</span>
+                  <div className="date-inputs">
+                    <input
+                      type="date"
+                      value={dateRange.from}
+                      onChange={(e) => setDateRange(prev => ({ ...prev, from: e.target.value }))}
+                      className="date-input"
+                      max={dateRange.to || undefined}
+                    />
+                    <span className="date-separator">to</span>
+                    <input
+                      type="date"
+                      value={dateRange.to}
+                      onChange={(e) => setDateRange(prev => ({ ...prev, to: e.target.value }))}
+                      className="date-input"
+                      min={dateRange.from || undefined}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             
             <div className="search-results">
               {isLoading ? (
                 <div className="search-message">Searching...</div>
-              ) : searchResults.length > 0 ? (
-                searchResults.map(post => (
-                  <div 
-                    key={post._id} 
-                    className="search-result-item"
-                    onClick={() => handleResultClick(post._id)}
-                  >
-                    <div className="result-author">
-                      <Avatar
-                        firstName={post.firstName}
-                        lastName={post.lastName}
-                        profilePicture={post.profilePicture}
-                        size="small"
-                      />
-                      <div className="result-author-info">
-                        <span className="author-name">
-                          {post.firstName} {post.lastName}
-                        </span>
-                        <span className="post-date">
-                          {new Date(post.createdAt).toLocaleDateString()}
-                        </span>
+              ) : searchIn === 'users' ? (
+                searchResults.users.length > 0 ? (
+                  searchResults.users.map(user => (
+                    <div 
+                      key={user._id} 
+                      className="search-result-item user-result"
+                      onClick={() => navigate(`/profile/${user._id}`)}
+                    >
+                      <div className="result-author">
+                        <Avatar
+                          firstName={user.firstName}
+                          lastName={user.lastName}
+                          profilePicture={user.profilePicture}
+                          size="medium"
+                        />
+                        <div className="result-author-info">
+                          <span className="author-name">
+                            {user.firstName} {user.lastName}
+                          </span>
+                          <span className="user-email">
+                            {user.email}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <h3 className="result-title">{post.title}</h3>
-                    <p className="result-preview">
-                      {post.content.substring(0, 100)}...
-                    </p>
-                  </div>
-                ))
-              ) : searchTerm ? (
-                <div className="search-message">No results found</div>
+                  ))
+                ) : searchTerm ? (
+                  <div className="search-message">No users found</div>
+                ) : (
+                  <div className="search-message">Start typing to search users</div>
+                )
               ) : (
-                <div className="search-message">Start typing to search</div>
+                searchResults.posts.length > 0 ? (
+                  searchResults.posts.map(post => (
+                    <div 
+                      key={post._id} 
+                      className="search-result-item"
+                      onClick={() => handleResultClick(post._id)}
+                    >
+                      <div className="result-author">
+                        <Avatar
+                          firstName={post.firstName}
+                          lastName={post.lastName}
+                          profilePicture={post.profilePicture}
+                          size="small"
+                        />
+                        <div className="result-author-info">
+                          <span className="author-name">
+                            {post.firstName} {post.lastName}
+                          </span>
+                          <span className="post-date">
+                            {new Date(post.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      <h3 className="result-title">{post.title}</h3>
+                      <p className="result-preview">
+                        {post.content.substring(0, 100)}...
+                      </p>
+                    </div>
+                  ))
+                ) : searchTerm ? (
+                  <div className="search-message">No results found</div>
+                ) : (
+                  <div className="search-message">Start typing to search</div>
+                )
               )}
             </div>
           </div>

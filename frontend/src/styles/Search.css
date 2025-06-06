@@ -173,6 +173,7 @@
 
 .filter-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -262,4 +263,28 @@
   .date-input {
     flex: 1;
   }
+
+  .filter-buttons {
+    width: 100%;
+  }
+  
+  .filter-button {
+    flex: 1;
+    text-align: center;
+    min-width: calc(50% - 4px);
+  }
+}
+
+.user-result {
+  display: flex;
+  align-items: center;
+}
+
+.user-result .result-author {
+  margin-bottom: 0;
+}
+
+.user-email {
+  color: #666;
+  font-size: 13px;
 }

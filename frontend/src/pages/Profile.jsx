@@ -6,6 +6,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Avatar from '../components/Avatar';
 import PostCard from '../components/PostCard';
 import { useParams } from 'react-router-dom';
+import Search from '../components/Search';
 
 // Separate EditModal into its own component
 const EditModal = ({ updateData, setUpdateData, handleUpdate, error, onClose, userInfo }) => {
@@ -174,6 +175,7 @@ function Profile() {
     confirmNewPassword: ''
   });
   const [error, setError] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -300,12 +302,34 @@ function Profile() {
         </div>
 
         <div className="user-posts">
-          <h2 className="posts-title">
-            {isOwnProfile 
-              ? "My Posts" 
-              : `${userInfo.firstName}'s Posts`
-            }
-          </h2>
+          <div className="posts-header">
+            <h2 className="posts-title">
+              {isOwnProfile 
+                ? "My Posts" 
+                : `${userInfo.firstName}'s Posts`
+              }
+            </h2>
+            <button 
+              className="search-capsule"
+              onClick={() => setIsSearchOpen(true)}
+              //data-tooltip="Search Posts"
+            >
+              <svg 
+                width="16" 
+                height="16" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <span>Search</span>
+            </button>
+          </div>
           {userPosts.map(post => (
             <PostCard
               key={post._id}
@@ -326,6 +350,11 @@ function Profile() {
           userInfo={userInfo}
         />
       )}
+      <Search 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)} 
+        userId={userId} // Add this prop
+      />
     </>
   );
 }
