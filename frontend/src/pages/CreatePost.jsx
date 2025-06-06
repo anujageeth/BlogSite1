@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/CreatePost.css';
+import Toast from '../components/Toast';
 
 function CreatePost() {
   const [title, setTitle] = useState('');
@@ -9,6 +10,7 @@ function CreatePost() {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '' });
   const navigate = useNavigate();
 
   const token = localStorage.getItem('token');
@@ -56,9 +58,12 @@ function CreatePost() {
           'Content-Type': 'multipart/form-data'
         }
       });
-      navigate('/feed');
+      setToast({ show: true, message: 'Post created successfully!' });
+      setTimeout(() => {
+        navigate('/feed');
+      }, 1000);
     } catch (err) {
-      console.error('Error creating post:', err.response?.data || err.message);
+      console.error('Error creating post:', err);
       alert('Failed to create post. Please try again.');
     } finally {
       setIsLoading(false);
@@ -66,72 +71,82 @@ function CreatePost() {
   };
 
   return (
-    <div className="create-post-container">
-      <h2 className="create-post-title">Create New Post</h2>
-      <input 
-        className="create-post-input"
-        value={title} 
-        onChange={e => setTitle(e.target.value)} 
-        placeholder="Title" 
-        required
-      />
-      <textarea 
-        className="create-post-textarea"
-        value={content} 
-        onChange={e => setContent(e.target.value)} 
-        placeholder="Content"
-        required 
-      />
-      <div className="image-upload-container">
-        <input
-          type="file"
-          id="image-upload"
-          className="image-upload-input"
-          accept="image/*"
-          onChange={handleImageChange}
+    <>
+      <div className="create-post-container">
+        <h2 className="create-post-title">Create New Post</h2>
+        <input 
+          className="create-post-input"
+          value={title} 
+          onChange={e => setTitle(e.target.value)} 
+          placeholder="Title" 
+          required
         />
-        <label htmlFor="image-upload" className="image-upload-label">
-          <svg 
-            width="24" 
-            height="24" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7" />
-            <line x1="16" y1="5" x2="22" y2="5" />
-            <line x1="19" y1="2" x2="19" y2="8" />
-            <circle cx="9" cy="9" r="2" />
-            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-          </svg>
-          Add Image
-        </label>
-        {imagePreview && (
-          <div className="image-preview-container">
-            <img src={imagePreview} alt="Preview" className="image-preview" />
-            <button 
-              className="remove-image-button"
-              onClick={() => {
-                setImage(null);
-                setImagePreview('');
-              }}
+        <textarea 
+          className="create-post-textarea"
+          value={content} 
+          onChange={e => setContent(e.target.value)} 
+          placeholder="Content"
+          required 
+        />
+        <div className="image-upload-container">
+          <input
+            type="file"
+            id="image-upload"
+            className="image-upload-input"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+          <label htmlFor="image-upload" className="image-upload-label">
+            <svg 
+              width="24" 
+              height="24" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              ×
-            </button>
-          </div>
-        )}
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7" />
+              <line x1="16" y1="5" x2="22" y2="5" />
+              <line x1="19" y1="2" x2="19" y2="8" />
+              <circle cx="9" cy="9" r="2" />
+              <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+            </svg>
+            Add Image
+          </label>
+          {imagePreview && (
+            <div className="image-preview-container">
+              <img src={imagePreview} alt="Preview" className="image-preview" />
+              <button 
+                className="remove-image-button"
+                onClick={() => {
+                  setImage(null);
+                  setImagePreview('');
+                }}
+              >
+                ×
+              </button>
+            </div>
+          )}
+        </div>
+        <button 
+          className="create-post-button"
+          onClick={submitPost}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Creating...' : 'Submit Post'}
+        </button>
       </div>
-      <button 
-        className="create-post-button"
-        onClick={submitPost}
-        disabled={isLoading}
-      >
-        {isLoading ? 'Creating...' : 'Submit Post'}
-      </button>
-    </div>
+      {toast.show && (
+        <div className="toast-container">
+          <Toast 
+            message={toast.message}
+            onClose={() => setToast({ show: false, message: '' })}
+          />
+        </div>
+      )}
+    </>
   );
 }
 

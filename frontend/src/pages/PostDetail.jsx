@@ -6,6 +6,7 @@ import Avatar from '../components/Avatar';
 import useClickOutside from '../hooks/useClickOutside';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Comment from '../components/Comment';
+import Toast from '../components/Toast';
 import '../styles/PostDetail.css';
 
 function PostDetail() {
@@ -20,6 +21,7 @@ function PostDetail() {
   const [comments, setComments] = useState([]);
   const [commentInput, setCommentInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '' });
   const dropdownRef = useRef(null);
   const commentsRef = useRef(null);
   const commentInputRef = useRef(null);
@@ -141,6 +143,7 @@ function PostDetail() {
       );
       setComments(prev => [res.data, ...prev]);
       setCommentInput('');
+      setToast({ show: true, message: 'Comment posted successfully!' });
     } catch (err) {
       console.error('Error posting comment:', err);
     } finally {
@@ -263,8 +266,18 @@ function PostDetail() {
                 <button 
                   className="post-menu-button"
                   onClick={toggleDropdown}
+                  aria-label="Post menu"
                 >
-                  <span className="dots"></span>
+                  <svg 
+                    viewBox="0 0 24 24" 
+                    width="24"
+                    height="24"
+                    fill="currentColor"
+                  >
+                    <circle cx="12" cy="6" r="2.5"/>
+                    <circle cx="12" cy="12" r="2.5"/>
+                    <circle cx="12" cy="18" r="2.5"/>
+                  </svg>
                 </button>
                 {isDropdownOpen && (
                   <div className="post-dropdown">
@@ -272,12 +285,37 @@ function PostDetail() {
                       className="dropdown-item"
                       onClick={() => navigate(`/edit-post/${post._id}`)}
                     >
+                      <svg 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        width="16"
+                        height="16"
+                      >
+                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                      </svg>
                       Edit Post
                     </button>
                     <button
                       className="dropdown-item delete"
                       onClick={() => setShowConfirmDialog(true)}
                     >
+                      <svg 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        width="16"
+                        height="16"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                      </svg>
                       Delete Post
                     </button>
                   </div>
@@ -375,6 +413,14 @@ function PostDetail() {
         }}
         onCancel={() => setShowConfirmDialog(false)}
       />
+      {toast.show && (
+        <div className="toast-container">
+          <Toast 
+            message={toast.message}
+            onClose={() => setToast({ show: false, message: '' })}
+          />
+        </div>
+      )}
     </>
   );
 }

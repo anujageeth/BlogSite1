@@ -1,0 +1,117 @@
+.toast-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.toast {
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: toastAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+  min-width: 200px;
+  text-align: center;
+}
+
+/* .toast.success {
+  border-left: 4px solid #ff8100;
+} */
+
+.toast-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #333;
+}
+
+.toast.success svg {
+  color: #ff8100;
+  width: 32px;
+  height: 32px;
+  animation: checkmarkAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s both;
+  stroke-width: 3;
+}
+
+.toast-content span {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.7;
+}
+
+.toast-close:hover {
+  background: rgba(255, 129, 0, 0.1);
+  color: #ff8100;
+  opacity: 1;
+  transform: rotate(90deg);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes toastAppear {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes checkmarkAppear {
+  0% {
+    transform: scale(0.5) rotate(-15deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .toast {
+    margin: 0 20px;
+    max-width: calc(100% - 40px);
+  }
+}

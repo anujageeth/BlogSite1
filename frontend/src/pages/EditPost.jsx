@@ -3,12 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/NavBar';
 import '../styles/CreatePost.css';  // Reuse CreatePost styles
+import Toast from '../components/Toast';
 
 function EditPost() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [toast, setToast] = useState({ show: false, message: '' });
   const { postId } = useParams();
   const navigate = useNavigate();
 
@@ -42,12 +44,14 @@ function EditPost() {
     setError('');
 
     try {
-      const token = localStorage.getItem('token');
       await axios.put(`http://localhost:5000/api/posts/${postId}`,
         { title, content },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
-      navigate('/feed');
+      setToast({ show: true, message: 'Post updated successfully!' });
+      setTimeout(() => {
+        navigate('/feed');
+      }, 1000);
     } catch (err) {
       console.error('Error updating post:', err);
       setError(err.response?.data?.msg || 'Failed to update post');
@@ -93,6 +97,14 @@ function EditPost() {
           </div>
         </form>
       </div>
+      {toast.show && (
+        <div className="toast-container">
+          <Toast 
+            message={toast.message}
+            onClose={() => setToast({ show: false, message: '' })}
+          />
+        </div>
+      )}
     </>
   );
 }
