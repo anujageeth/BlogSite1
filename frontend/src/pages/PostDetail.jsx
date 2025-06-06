@@ -21,6 +21,8 @@ function PostDetail() {
   const [commentInput, setCommentInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const dropdownRef = useRef(null);
+  const commentsRef = useRef(null);
+  const commentInputRef = useRef(null);
   const { postId } = useParams();
   const navigate = useNavigate();
 
@@ -146,9 +148,56 @@ function PostDetail() {
     }
   };
 
+  const handleDeleteComment = async (commentId) => {
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/posts/${postId}/comments/${commentId}`,
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      // Update comments list after deletion
+      setComments(prev => prev.filter(comment => comment._id !== commentId));
+    } catch (err) {
+      console.error('Error deleting comment:', err);
+      // You might want to add error handling UI here
+    }
+  };
+
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
+
+  useEffect(() => {
+    // Scroll to comments if URL has #comments hash
+    if (window.location.hash === '#comments' && commentsRef.current) {
+      commentsRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  }, [comments]); // Add comments as dependency to ensure section exists
+
+  // Update this useEffect to handle comment input scrolling
+  useEffect(() => {
+    if (!post || !commentInputRef.current) return;
+
+    const scrollToTarget = () => {
+      if (window.location.hash === '#comment') {
+        setTimeout(() => {
+          commentInputRef.current?.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'center'
+          });
+          commentInputRef.current?.focus();
+        }, 100); // Small delay to ensure proper scrolling
+      }
+    };
+
+    scrollToTarget();
+
+    // Add event listener for browser back/forward navigation
+    window.addEventListener('hashchange', scrollToTarget);
+    return () => window.removeEventListener('hashchange', scrollToTarget);
+  }, [post]);
 
   if (isLoading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error-message">{error}</div>;
@@ -250,6 +299,7 @@ function PostDetail() {
                 </div>
               <form className="comment-form" onSubmit={handleComment}>
                 <input
+                  ref={commentInputRef}
                   type="text"
                   className="comment-input"
                   placeholder="Write a comment..."
@@ -263,7 +313,7 @@ function PostDetail() {
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path 
-                      d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9" 
+                      d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z" 
                       stroke="currentColor" 
                       strokeWidth="2" 
                       strokeLinecap="round"
@@ -276,11 +326,17 @@ function PostDetail() {
             </div>
           </div>
           {comments.length > 0 && (
-            <div className="comments-section">
+            <div className="comments-section" ref={commentsRef}>
               <h3 className="comments-title">Comments ({comments.length})</h3>
               <div className="comments-list">
                 {comments.map(comment => (
-                  <Comment key={comment._id} comment={comment} />
+                  <Comment 
+                    key={comment._id} 
+                    comment={comment}
+                    currentUser={currentUser}
+                    postAuthor={post.author}
+                    onDelete={handleDeleteComment}
+                  />
                 ))}
               </div>
             </div>

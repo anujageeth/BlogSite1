@@ -11,7 +11,7 @@ function PostCard({ post, currentUser, onDelete }) {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes?.length || 0);
-  const [commentCount, setCommentCount] = useState(0);
+  const [commentCount, setCommentCount] = useState(post.comments || 0);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -72,6 +72,11 @@ function PostCard({ post, currentUser, onDelete }) {
     }
   };
 
+  const handleCommentClick = (e) => {
+    e.stopPropagation(); // Prevent triggering the post content click
+    navigate(`/post/${post._id}#comment`);
+  };
+
   const isOwner = String(currentUser?.id) === String(post.author);
 
   return (
@@ -110,7 +115,7 @@ function PostCard({ post, currentUser, onDelete }) {
               </button>
               <button 
                 className="interaction-button"
-                onClick={() => navigate(`/post/${post._id}#comments`)}
+                onClick={handleCommentClick}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path 

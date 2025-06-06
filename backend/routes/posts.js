@@ -12,12 +12,17 @@ router.get('/', async (req, res) => {
       .populate('author', 'firstName lastName profilePicture')
       .sort({ createdAt: -1 });
     
-    const transformedPosts = posts.map(post => ({
-      ...post.toObject(),
-      likes: post.likes?.length || 0
+    // Get comments count for each post
+    const postsWithCounts = await Promise.all(posts.map(async post => {
+      const commentsCount = await Comment.countDocuments({ post: post._id });
+      return {
+        ...post.toObject(),
+        likes: post.likes?.length || 0,
+        comments: commentsCount
+      };
     }));
     
-    res.json(transformedPosts);
+    res.json(postsWithCounts);
   } catch (err) {
     res.status(500).json({ msg: "Error fetching posts" });
   }
@@ -188,6 +193,32 @@ router.post('/:id/comments', authMiddleware, async (req, res) => {
     res.status(201).json(comment);
   } catch (err) {
     res.status(500).json({ msg: "Error creating comment" });
+  }
+});
+
+// Delete comment
+router.delete('/:postId/comments/:commentId', authMiddleware, async (req, res) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+    
+    if (!comment) {
+      return res.status(404).json({ msg: "Comment not found" });
+    }
+
+    // Check if user owns the comment or the post
+    const post = await Post.findById(req.params.postId);
+    const isCommentOwner = String(comment.author) === String(req.user.id);
+    const isPostOwner = String(post.author) === String(req.user.id);
+
+    if (!isCommentOwner && !isPostOwner) {
+      return res.status(403).json({ msg: "Not authorized to delete this comment" });
+    }
+
+    await comment.deleteOne();
+    res.json({ msg: "Comment deleted successfully" });
+  } catch (err) {
+    console.error('Delete comment error:', err);
+    res.status(500).json({ msg: "Error deleting comment" });
   }
 });
 
