@@ -1,3 +1,76 @@
+.welcome-box {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 32px rgba(255, 129, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 129, 0, 0.18);
+  padding: 24px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.welcome-content h2 {
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.welcome-content p {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.welcome-create-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ff8100;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.welcome-create-button:hover {
+  background: #ff9500;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 129, 0, 0.2);
+}
+
+.welcome-create-button:active {
+  transform: translateY(0);
+}
+
+.welcome-create-button svg {
+  transition: transform 0.3s ease;
+}
+
+.welcome-create-button:hover svg {
+  transform: rotate(90deg);
+}
+
+/* Add responsive styles */
+@media (max-width: 768px) {
+  .welcome-box {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .welcome-content h2 {
+    font-size: 20px;
+  }
+}
+
 .feed-container {
   max-width: 800px;
   margin: 40px auto;

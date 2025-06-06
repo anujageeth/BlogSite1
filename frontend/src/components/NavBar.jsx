@@ -113,7 +113,7 @@ function Navbar() {
         {userInfo ? (
           <div className="nav-actions">
             <button 
-              className="create-post-button"
+              className="create-post-button welcome-create-button"
               onClick={() => navigate('/create')}
               data-tooltip="Create Post"
             >
@@ -155,7 +155,7 @@ function Navbar() {
                 )}
               </button>
               {isNotificationOpen && (
-                <div className="notification-dropdown">
+                <div className={`notification-dropdown ${isNotificationOpen ? 'show' : ''}`}>
                   <h3 className="notification-header">Notifications</h3>
                   <div className="notification-list">
                     {notifications.length > 0 ? (

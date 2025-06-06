@@ -57,8 +57,37 @@
   border: 1px solid rgba(255, 129, 0, 0.2);
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 180px;
+  position: relative;
+  overflow: hidden;
+}
+
+.user-info::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 129, 0, 0.1);
+  border-radius: 12px;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.user-info:hover {
+  border-color: rgba(255, 129, 0, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 129, 0, 0.1);
+}
+
+.user-info:hover::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.user-info:active {
+  transform: translateY(1px);
 }
 
 .user-info-content {
@@ -66,6 +95,8 @@
   align-items: center;
   gap: 12px;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .user-details {
@@ -79,11 +110,21 @@
   font-weight: 600;
   font-size: 14px;
   margin-bottom: 4px;
+  transition: all 0.3s ease;
 }
 
 .user-email {
   color: #666;
   font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.user-info:hover .user-name {
+  color: #ff9500;
+}
+
+.user-info:hover .user-email {
+  color: #444;
 }
 
 .dropdown-menu {
@@ -161,10 +202,19 @@
   justify-content: center;
 }
 
+.notification-button svg {
+  transform-origin: top center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .notification-button:hover {
   background: rgba(255, 129, 0, 0.1);
   color: #ff8100;
-  transform: translateY(-1px);
+}
+
+.notification-button:hover svg {
+  animation: notificationSwing 1s ease-in-out infinite;
+  color: #ff8100;
 }
 
 .notification-button:active {
@@ -210,7 +260,33 @@
   max-height: 400px;
   overflow-y: auto;
   z-index: 1001;
-  animation: dropdownFade 0.2s ease;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.notification-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Remove the animation since we're using transition */
+.notification-dropdown {
+  animation: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  background: linear-gradient(
+    to bottom,
+    rgb(255, 255, 255) 0%,
+    rgb(255, 255, 255) 85%,
+    rgb(255, 232, 211) 100%
+  );
+}
+
+.notification-dropdown::-webkit-scrollbar {
+  display: none;
 }
 
 .notification-header {
@@ -222,7 +298,18 @@
 }
 
 .notification-list {
+  position: relative;
   padding: 8px 0;
+}
+
+.notification-list::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  pointer-events: none;
 }
 
 .notification-item {
@@ -296,7 +383,7 @@
 
 .create-post-button:hover {
   background: rgba(255, 129, 0, 0.1);
-  color: #ff8100;
+  
   transform: translateY(-1px);
 }
 
@@ -347,6 +434,16 @@
   to {
     opacity: 1;
   }
+}
+
+/* Add swing animation keyframes */
+@keyframes notificationSwing {
+  0% { transform: rotate(0deg); }
+  20% { transform: rotate(15deg); }
+  40% { transform: rotate(-15deg); }
+  60% { transform: rotate(7deg); }
+  80% { transform: rotate(-7deg); }
+  100% { transform: rotate(0deg); }
 }
 
 /* Update tooltip styles */
@@ -426,6 +523,6 @@
 .create-post-button:hover,
 .notification-button:hover {
   background: rgba(255, 129, 0, 0.1);
-  color: #ff8100;
+  /* color: #ff8100; */
   transform: translateY(-1px);
 }
