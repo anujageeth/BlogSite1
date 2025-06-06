@@ -8,7 +8,12 @@ const postSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   profilePicture: { type: String },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  createdAt: { type: Date, default: Date.now }
+  image: {
+    type: String,
+    default: ''
+  }
+}, {
+  timestamps: true
 });
 
 export default mongoose.model('Post', postSchema);

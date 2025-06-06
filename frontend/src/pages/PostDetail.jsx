@@ -286,6 +286,19 @@ function PostDetail() {
             )}
           </div>
           <h1 className="post-detail-title">{post.title}</h1>
+          
+          {/* Add image section */}
+          {post.image && (
+            <div className="post-image-container">
+              <img 
+                src={post.image} 
+                alt={post.title}
+                className="post-detail-image"
+                loading="lazy"
+              />
+            </div>
+          )}
+          
           <p className="post-detail-content">{post.content}</p>
           
           {/* Update the post-detail-footer section */}

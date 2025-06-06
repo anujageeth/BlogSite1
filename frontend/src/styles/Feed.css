@@ -157,6 +157,51 @@
   opacity: 0.8;
 }
 
+.post-content-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.post-text {
+  flex: 1;
+  min-width: 0; /* Prevent text from pushing image */
+}
+
+.post-thumbnail {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.post-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.post-content-wrapper:hover .post-thumbnail img {
+  transform: scale(1.05);
+}
+
+/* Update responsive design */
+@media (max-width: 768px) {
+  .post-content-container {
+    flex-direction: column;
+  }
+
+  .post-thumbnail {
+    width: 100%;
+    height: 200px;
+    margin-top: 12px;
+  }
+}
+
+/* Update existing post content styles */
 .post-content {
   overflow: hidden;
   text-overflow: ellipsis;

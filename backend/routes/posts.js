@@ -2,6 +2,8 @@ import express from 'express';
 import Post from '../models/Post.js';
 import Comment from '../models/Comment.js';
 import Notification from '../models/Notification.js';
+import cloudinary from '../config/cloudinary.js';
+import upload from '../middleware/upload.js';
 import { authMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -30,21 +32,44 @@ router.get('/', async (req, res) => {
 });
 
 // Create post
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     const { title, content } = req.body;
+    
+    let imageUrl = '';
+    if (req.file) {
+      try {
+        // Convert buffer to base64
+        const b64 = Buffer.from(req.file.buffer).toString('base64');
+        const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+        
+        // Upload to Cloudinary
+        const uploadResponse = await cloudinary.uploader.upload(dataURI, {
+          folder: 'blog_images',
+          resource_type: 'auto'
+        });
+        
+        imageUrl = uploadResponse.secure_url;
+      } catch (uploadErr) {
+        console.error('Cloudinary upload error:', uploadErr);
+        return res.status(500).json({ msg: "Error uploading image" });
+      }
+    }
+
     const post = new Post({
       title,
       content,
+      image: imageUrl,
       author: req.user.id,
       firstName: req.user.firstName,
-      lastName: req.user.lastName,
-      profilePicture: req.user.profilePicture
+      lastName: req.user.lastName
     });
-    const savedPost = await post.save();
-    res.status(201).json(savedPost);
+
+    await post.save();
+    res.status(201).json(post);
   } catch (err) {
-    res.status(500).json({ msg: "Error creating post" });
+    console.error('Post creation error:', err);
+    res.status(500).json({ msg: "Error creating post", error: err.message });
   }
 });
 

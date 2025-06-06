@@ -177,13 +177,26 @@ function PostCard({ post, currentUser, onDelete }) {
             )}
           </div>
         </div>
-        <div 
-          className="post-content-wrapper"
-          onClick={() => navigate(`/post/${post._id}`)}
-          style={{ cursor: 'pointer' }}
-        >
-          <h3 className="post-title">{post.title}</h3>
-          <p className="post-content">{post.content}</p>
+        <div className="post-content-wrapper">
+          <div 
+            className="post-content-container"
+            onClick={() => navigate(`/post/${post._id}`)}
+            style={{ cursor: 'pointer' }}
+          >
+            <div className="post-text">
+              <h3 className="post-title">{post.title}</h3>
+              <p className="post-content">{post.content}</p>
+            </div>
+            {post.image && (
+              <div className="post-thumbnail">
+                <img 
+                  src={post.image} 
+                  alt={post.title}
+                  loading="lazy"
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <ConfirmDialog
