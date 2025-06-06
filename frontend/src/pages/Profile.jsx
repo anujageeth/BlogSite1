@@ -7,6 +7,7 @@ import Avatar from '../components/Avatar';
 import PostCard from '../components/PostCard';
 import { useParams } from 'react-router-dom';
 import Search from '../components/Search';
+import Toast from '../components/Toast';
 
 // Separate EditModal into its own component
 const EditModal = ({ updateData, setUpdateData, handleUpdate, error, onClose, userInfo }) => {
@@ -176,6 +177,12 @@ function Profile() {
   });
   const [error, setError] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  // Add subscriberCount to the state
+  const [subscriberCount, setSubscriberCount] = useState(0);
+  // Add isSubscribed state after other state declarations
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  // Add toast state after other state declarations
+  const [toast, setToast] = useState({ show: false, message: '' });
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -190,8 +197,10 @@ function Profile() {
 
     const fetchUserData = async () => {
       try {
+        let userData;
         // If viewing own profile
         if (userId === decoded.id) {
+          userData = decoded;
           setUserInfo(decoded);
           setUpdateData(prev => ({
             ...prev,
@@ -205,8 +214,12 @@ function Profile() {
           const res = await axios.get(`http://localhost:5000/api/auth/profile/${userId}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
+          userData = res.data;
           setUserInfo(res.data);
         }
+
+        // Set subscriber count
+        setSubscriberCount(userData.subscribers?.length || 0);
 
         // Fetch user's posts
         const postsRes = await axios.get(`http://localhost:5000/api/posts/user/${userId}`, {
@@ -223,6 +236,25 @@ function Profile() {
 
     fetchUserData();
   }, [userId]);
+
+  // Add useEffect to fetch subscription status
+  useEffect(() => {
+    const fetchSubscriptionStatus = async () => {
+      if (!userId || !currentUser || userId === currentUser.id) return;
+      
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/auth/subscribe/${userId}`,
+          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        );
+        setIsSubscribed(res.data.isSubscribed);
+      } catch (err) {
+        console.error('Error fetching subscription status:', err);
+      }
+    };
+
+    fetchSubscriptionStatus();
+  }, [userId, currentUser]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -268,6 +300,35 @@ function Profile() {
     }
   };
 
+  // Update the handleSubscribe function
+  const handleSubscribe = async () => {
+    if (!currentUser) {
+      window.location.href = '/login';
+      return;
+    }
+
+    try {
+      const res = await axios.put(
+        `http://localhost:5000/api/auth/subscribe/${userId}`,
+        {},
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      
+      setIsSubscribed(res.data.isSubscribed);
+      setSubscriberCount(res.data.subscriberCount);
+      setToast({ 
+        show: true, 
+        message: res.data.isSubscribed ? 'Subscribed successfully!' : 'Unsubscribed successfully!' 
+      });
+    } catch (err) {
+      console.error('Error updating subscription:', err);
+      setToast({ 
+        show: true, 
+        message: err.response?.data?.msg || 'Error updating subscription' 
+      });
+    }
+  };
+
   if (isLoading) return <div>Loading...</div>;
 
   // Show edit button only if viewing own profile
@@ -279,17 +340,50 @@ function Profile() {
       <div className="profile-container">
         <div className="profile-header">
           <div className="profile-header-content">
-            <Avatar 
-              firstName={userInfo.firstName}
-              lastName={userInfo.lastName}
-              profilePicture={userInfo.profilePicture}
-              size="large"
-            />
-            <div className="profile-info">
-              <h2 className="profile-title">Profile</h2>
-              <p><strong>Name:</strong> {userInfo.firstName} {userInfo.lastName}</p>
-              <p><strong>Email:</strong> {userInfo.email}</p>
+            <div className="profile-main-info">
+              <Avatar 
+                firstName={userInfo.firstName}
+                lastName={userInfo.lastName}
+                profilePicture={userInfo.profilePicture}
+                size="large"
+              />
+              <div className="profile-info">
+                <h2 className="profile-title">Profile</h2>
+                <p><strong>Name:</strong> {userInfo.firstName} {userInfo.lastName}</p>
+                <p><strong>Email:</strong> {userInfo.email}</p>
+                <p className="subscriber-count">
+                  <strong>Plugged ins:</strong> {subscriberCount}
+                </p>
+              </div>
             </div>
+            {!isOwnProfile && (
+              <button 
+                className={`subscribe-button ${isSubscribed ? 'subscribed' : ''}`}
+                onClick={handleSubscribe}
+              >
+                <svg 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  {isSubscribed ? (
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  ) : (
+                    <>
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="8" x2="12" y2="16"/>
+                      <line x1="8" y1="12" x2="16" y2="12"/>
+                    </>
+                  )}
+                </svg>
+                <span>{isSubscribed ? 'Plugged in' : 'Plug in'}</span>
+              </button>
+            )}
           </div>
           {isOwnProfile && (
             <button 
@@ -355,6 +449,13 @@ function Profile() {
         onClose={() => setIsSearchOpen(false)} 
         userId={userId} // Add this prop
       />
+      {/* Add Toast component at the bottom of the JSX, before the closing tag */}
+      {toast.show && (
+        <Toast 
+          message={toast.message}
+          onClose={() => setToast({ show: false, message: '' })}
+        />
+      )}
     </>
   );
 }

@@ -22,6 +22,7 @@ function PostDetail() {
   const [commentInput, setCommentInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '' });
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const dropdownRef = useRef(null);
   const commentsRef = useRef(null);
   const commentInputRef = useRef(null);
@@ -97,6 +98,25 @@ function PostDetail() {
     }
   }, [post, postId]);
 
+  // Add this useEffect to fetch subscription status
+  useEffect(() => {
+    const fetchSubscriptionStatus = async () => {
+      if (!post?.author?._id || !currentUser) return;
+      
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/auth/subscribe/${post.author._id}`,
+          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        );
+        setIsSubscribed(res.data.isSubscribed);
+      } catch (err) {
+        console.error('Error fetching subscription status:', err);
+      }
+    };
+
+    fetchSubscriptionStatus();
+  }, [post, currentUser]);
+
   const handleDelete = async () => {
     try {
       await axios.delete(`http://localhost:5000/api/posts/${postId}`, {
@@ -164,6 +184,35 @@ function PostDetail() {
     } catch (err) {
       console.error('Error deleting comment:', err);
       // You might want to add error handling UI here
+    }
+  };
+
+  // Add the handleSubscribe function
+  const handleSubscribe = async () => {
+    if (!currentUser) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const res = await axios.put(
+        `http://localhost:5000/api/auth/subscribe/${post.author._id}`,
+        {},
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      
+      setIsSubscribed(res.data.isSubscribed);
+      
+      setToast({ 
+        show: true, 
+        message: res.data.isSubscribed ? 'Subscribed successfully!' : 'Unsubscribed successfully!' 
+      });
+    } catch (err) {
+      console.error('Error updating subscription:', err);
+      setToast({ 
+        show: true, 
+        message: err.response?.data?.msg || 'Error updating subscription' 
+      });
     }
   };
 
@@ -263,34 +312,102 @@ function PostDetail() {
                 </span>
               </div>
             </div>
-            {currentUser && (
-              <div className="post-actions" ref={dropdownRef}>
-                <button 
-                  className="post-menu-button"
-                  onClick={toggleDropdown}
-                  aria-label="Post menu"
+            <div className="post-actions-wrapper">
+              <button 
+                className={`subscribe-button ${isSubscribed ? 'subscribed' : ''}`}
+                onClick={handleSubscribe}
+                disabled={currentUser?.id === post.author._id}
+                aria-label={isSubscribed ? 'Unsubscribe from author' : 'Subscribe to author'}
+              >
+                <svg 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  <svg 
-                    viewBox="0 0 24 24" 
-                    width="24"
-                    height="24"
+                  {isSubscribed ? (
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  ) : (
+                    <>
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="8" x2="12" y2="16"/>
+                      <line x1="8" y1="12" x2="16" y2="12"/>
+                    </>
+                  )}
+                </svg>
+                <span>{isSubscribed ? 'Plugged in' : 'Plug in'}</span>
+              </button>
+              {currentUser && (
+                <div className="post-actions" ref={dropdownRef}>
+                  <button 
+                    className="post-menu-button"
+                    onClick={toggleDropdown}
+                    aria-label="Post menu"
                   >
-                    <circle cx="12" cy="6" r="2.5" fill="currentColor"/>
-                    <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
-                    <circle cx="12" cy="18" r="2.5" fill="currentColor"/>
-                  </svg>
-                </button>
-                {isDropdownOpen && (
-                  <div className="post-dropdown">
-                    {isOwner ? (
-                      <>
-                        <button
-                          className="dropdown-item"
-                          onClick={() => {
-                            setIsDropdownOpen(false);
-                            navigate(`/edit-post/${post._id}`);
-                          }}
-                        >
+                    <svg 
+                      viewBox="0 0 24 24" 
+                      width="24"
+                      height="24"
+                    >
+                      <circle cx="12" cy="6" r="2.5" fill="currentColor"/>
+                      <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+                      <circle cx="12" cy="18" r="2.5" fill="currentColor"/>
+                    </svg>
+                  </button>
+                  {isDropdownOpen && (
+                    <div className="post-dropdown">
+                      {isOwner ? (
+                        <>
+                          <button
+                            className="dropdown-item"
+                            onClick={() => {
+                              setIsDropdownOpen(false);
+                              navigate(`/edit-post/${post._id}`);
+                            }}
+                          >
+                            <svg 
+                              viewBox="0 0 24 24" 
+                              fill="none" 
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              width="16"
+                              height="16"
+                            >
+                              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                            </svg>
+                            Edit Post
+                          </button>
+                          <button
+                            className="dropdown-item delete"
+                            onClick={() => {
+                              setIsDropdownOpen(false);
+                              setShowConfirmDialog(true);
+                            }}
+                          >
+                            <svg 
+                              viewBox="0 0 24 24" 
+                              fill="none" 
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              width="16"
+                              height="16"
+                            >
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                            Delete Post
+                          </button>
+                        </>
+                      ) : (
+                        <button className="dropdown-item report">
                           <svg 
                             viewBox="0 0 24 24" 
                             fill="none" 
@@ -301,54 +418,16 @@ function PostDetail() {
                             width="16"
                             height="16"
                           >
-                            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                           </svg>
-                          Edit Post
+                          Report Post
                         </button>
-                        <button
-                          className="dropdown-item delete"
-                          onClick={() => {
-                            setIsDropdownOpen(false);
-                            setShowConfirmDialog(true);
-                          }}
-                        >
-                          <svg 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            width="16"
-                            height="16"
-                          >
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                          </svg>
-                          Delete Post
-                        </button>
-                      </>
-                    ) : (
-                      <button className="dropdown-item report">
-                        <svg 
-                          viewBox="0 0 24 24" 
-                          fill="none" 
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          width="16"
-                          height="16"
-                        >
-                          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
-                        Report Post
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
           <h1 className="post-detail-title">{post.title}</h1>
           
@@ -441,12 +520,10 @@ function PostDetail() {
         onCancel={() => setShowConfirmDialog(false)}
       />
       {toast.show && (
-        <div className="toast-container">
-          <Toast 
-            message={toast.message}
-            onClose={() => setToast({ show: false, message: '' })}
-          />
-        </div>
+        <Toast 
+          message={toast.message}
+          onClose={() => setToast({ show: false, message: '' })}
+        />
       )}
     </>
   );

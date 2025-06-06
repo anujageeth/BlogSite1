@@ -209,4 +209,87 @@ router.post('/upload-avatar', authMiddleware, upload.single('image'), async (req
   }
 });
 
+// Update the subscribe route
+router.put('/subscribe/:userId', authMiddleware, async (req, res) => {
+  try {
+    const userToSubscribe = await User.findById(req.params.userId);
+    if (!userToSubscribe) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    // Convert IDs to strings for comparison
+    const currentUserId = req.user._id.toString();
+    const targetUserId = req.params.userId;
+
+    if (currentUserId === targetUserId) {
+      return res.status(400).json({ msg: "Cannot subscribe to yourself" });
+    }
+
+    // Check if already subscribed
+    const isSubscribed = userToSubscribe.subscribers.some(
+      id => id.toString() === currentUserId
+    );
+    
+    if (isSubscribed) {
+      // Unsubscribe
+      userToSubscribe.subscribers = userToSubscribe.subscribers.filter(
+        id => id.toString() !== currentUserId
+      );
+    } else {
+      // Subscribe
+      userToSubscribe.subscribers.push(req.user._id);
+      
+      try {
+        // Create notification
+        const notification = new Notification({
+          recipient: userToSubscribe._id,
+          sender: {
+            _id: req.user._id,
+            firstName: req.user.firstName,
+            lastName: req.user.lastName,
+            profilePicture: req.user.profilePicture
+          },
+          type: 'subscribe'
+        });
+        await notification.save();
+      } catch (notifErr) {
+        console.error('Notification creation error:', notifErr);
+        // Continue even if notification fails
+      }
+    }
+
+    await userToSubscribe.save();
+
+    res.json({ 
+      isSubscribed: !isSubscribed,
+      subscriberCount: userToSubscribe.subscribers.length
+    });
+  } catch (err) {
+    console.error('Subscribe error:', err);
+    res.status(500).json({ msg: "Error updating subscription" });
+  }
+});
+
+// Update the get subscription status route
+router.get('/subscribe/:userId', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    const isSubscribed = user.subscribers.some(
+      id => id.toString() === req.user._id.toString()
+    );
+
+    res.json({
+      isSubscribed,
+      subscriberCount: user.subscribers.length
+    });
+  } catch (err) {
+    console.error('Subscription status error:', err);
+    res.status(500).json({ msg: "Error getting subscription status" });
+  }
+});
+
 export default router;

@@ -4,6 +4,7 @@ import Avatar from './Avatar';
 import useClickOutside from '../hooks/useClickOutside';
 import ConfirmDialog from './ConfirmDialog';
 import axios from 'axios';
+import Toast from './Toast';
 
 function PostCard({ post, currentUser, onDelete }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -12,6 +13,8 @@ function PostCard({ post, currentUser, onDelete }) {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes?.length || 0);
   const [commentCount, setCommentCount] = useState(post.comments || 0);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '' });
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -32,6 +35,25 @@ function PostCard({ post, currentUser, onDelete }) {
       console.error('Error fetching likes:', err);
     }
   };
+
+  // Add useEffect to fetch subscription status
+  useEffect(() => {
+    const fetchSubscriptionStatus = async () => {
+      if (!post?.author?._id || !currentUser) return;
+      
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/auth/subscribe/${post.author._id}`,
+          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        );
+        setIsSubscribed(res.data.isSubscribed);
+      } catch (err) {
+        console.error('Error fetching subscription status:', err);
+      }
+    };
+
+    fetchSubscriptionStatus();
+  }, [post, currentUser]);
 
   // Update useEffect to check for currentUser
   useEffect(() => {
@@ -90,6 +112,35 @@ function PostCard({ post, currentUser, onDelete }) {
     navigate(`/profile/${authorId}`);
   };
 
+  const handleSubscribe = async (e) => {
+    e.stopPropagation(); // Prevent post click navigation
+    
+    if (!currentUser) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const res = await axios.put(
+        `http://localhost:5000/api/auth/subscribe/${post.author._id}`,
+        {},
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      
+      setIsSubscribed(res.data.isSubscribed);
+      setToast({ 
+        show: true, 
+        message: res.data.isSubscribed ? 'Subscribed successfully!' : 'Unsubscribed successfully!' 
+      });
+    } catch (err) {
+      console.error('Error updating subscription:', err);
+      setToast({ 
+        show: true, 
+        message: err.response?.data?.msg || 'Error updating subscription' 
+      });
+    }
+  };
+
   const isOwner = currentUser && (
     String(currentUser.id) === String(post.author._id || post.author)
   );
@@ -117,6 +168,35 @@ function PostCard({ post, currentUser, onDelete }) {
             </div>
           </div>
           <div className="post-actions-group">
+            {currentUser && currentUser.id !== post.author._id && (
+              <button 
+                className={`subscribe-button ${isSubscribed ? 'subscribed' : ''}`}
+                onClick={handleSubscribe}
+                aria-label={isSubscribed ? 'Unsubscribe from author' : 'Subscribe to author'}
+              >
+                <svg 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  {isSubscribed ? (
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  ) : (
+                    <>
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="8" x2="12" y2="16"/>
+                      <line x1="8" y1="12" x2="16" y2="12"/>
+                    </>
+                  )}
+                </svg>
+                <span>{isSubscribed ? 'Plugged in' : 'Plug in'}</span>
+              </button>
+            )}
             <div className="interaction-buttons">
               <button 
                 className={`interaction-button ${isLiked ? 'liked' : ''}`}
@@ -268,6 +348,12 @@ function PostCard({ post, currentUser, onDelete }) {
         }}
         onCancel={() => setShowConfirmDialog(false)}
       />
+      {toast.show && (
+        <Toast 
+          message={toast.message}
+          onClose={() => setToast({ show: false, message: '' })}
+        />
+      )}
     </>
   );
 }

@@ -441,3 +441,53 @@
     font-size: 13px;
   }
 }
+
+.subscribe-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 129, 0, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  color: #ff8100;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.subscribe-button:hover:not(:disabled) {
+  background: rgba(255, 129, 0, 0.1);
+  border-color: #ff8100;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 129, 0, 0.1);
+}
+
+.subscribe-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.subscribe-button.subscribed {
+  background: #ff8100;
+  color: white;
+  border-color: #ff8100;
+}
+
+.subscribe-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .subscribe-button {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  
+  .subscribe-button svg {
+    width: 14px;
+    height: 14px;
+  }
+}
