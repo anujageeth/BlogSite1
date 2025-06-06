@@ -98,7 +98,7 @@ function PostCard({ post, currentUser, onDelete }) {
             <Avatar
               firstName={post.firstName}
               lastName={post.lastName}
-              profilePicture={post.profilePicture}
+              profilePicture={post.profilePicture} // Make sure this is passed
               size="small"
             />
             <div className="author-info">

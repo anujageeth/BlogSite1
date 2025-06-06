@@ -247,7 +247,7 @@ function PostDetail() {
               <Avatar
                 firstName={post.firstName}
                 lastName={post.lastName}
-                profilePicture={post.profilePicture}
+                profilePicture={post.profilePicture} // Make sure this is passed
                 size="medium"
               />
               <div className="author-info">

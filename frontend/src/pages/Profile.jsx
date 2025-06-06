@@ -9,17 +9,63 @@ import { useParams } from 'react-router-dom';
 
 // Separate EditModal into its own component
 const EditModal = ({ updateData, setUpdateData, handleUpdate, error, onClose, userInfo }) => {
+  const [uploadingImage, setUploadingImage] = useState(false);
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    // Validate file size
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size should be less than 5MB');
+      return;
+    }
+
     try {
-      const storageRef = ref( `profiles/${userInfo.id}/${file.name}`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      setUpdateData(prev => ({ ...prev, profilePicture: url }));
+      setUploadingImage(true);
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await axios.post('http://localhost:5000/api/auth/upload-avatar', 
+        formData,
+        {
+          headers: { 
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      // Update local state
+      setUpdateData(prev => ({ 
+        ...prev, 
+        profilePicture: response.data.imageUrl 
+      }));
+
+      // Update token with new profile picture
+      const currentToken = localStorage.getItem('token');
+      const decoded = JSON.parse(atob(currentToken.split('.')[1]));
+      const updatedUser = {
+        ...decoded,
+        profilePicture: response.data.imageUrl
+      };
+
+      // Get new token from backend with updated profile picture
+      const tokenResponse = await axios.post('http://localhost:5000/api/auth/refresh-token',
+        { user: updatedUser },
+        { headers: { Authorization: `Bearer ${currentToken}` } }
+      );
+
+      // Update token in localStorage
+      localStorage.setItem('token', tokenResponse.data.token);
+
+      // Force reload to update all components
+      window.location.reload();
     } catch (err) {
       console.error('Error uploading image:', err);
+      alert('Failed to upload image. Please try again.');
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -34,12 +80,19 @@ const EditModal = ({ updateData, setUpdateData, handleUpdate, error, onClose, us
             profilePicture={updateData.profilePicture}
             size="large"
           />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="file-input"
-          />
+          <div className="upload-button-wrapper">
+            <input
+              type="file"
+              id="profile-image"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="file-input"
+              disabled={uploadingImage}
+            />
+            <label htmlFor="profile-image" className={`upload-label ${uploadingImage ? 'uploading' : ''}`}>
+              {uploadingImage ? 'Uploading...' : 'Change Profile Picture'}
+            </label>
+          </div>
         </div>
         <form onSubmit={handleUpdate} className="edit-form">
           <input

@@ -5,6 +5,8 @@ import User from '../models/User.js';
 import { authMiddleware } from '../middleware/auth.js';  // Fix the import path
 import Post from '../models/Post.js';
 import Comment from '../models/Comment.js';
+import upload from '../middleware/upload.js';
+import cloudinary from '../config/cloudinary.js';
 
 const router = express.Router();
 
@@ -128,6 +130,74 @@ router.get('/profile/:userId', authMiddleware, async (req, res) => {
     res.json(user);
   } catch (err) {
     res.status(500).json({ msg: "Error fetching user profile" });
+  }
+});
+
+// Add this new route
+router.post('/refresh-token', authMiddleware, async (req, res) => {
+  try {
+    const { user } = req.body;
+    
+    // Generate new token with updated user info
+    const token = jwt.sign({ 
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      profilePicture: user.profilePicture
+    }, process.env.JWT_SECRET, {
+      expiresIn: '1h'
+    });
+
+    res.json({ token });
+  } catch (err) {
+    console.error('Token refresh error:', err);
+    res.status(500).json({ msg: "Error refreshing token" });
+  }
+});
+
+// Update the upload-avatar endpoint
+router.post('/upload-avatar', authMiddleware, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ msg: "No image file provided" });
+    }
+
+    const b64 = Buffer.from(req.file.buffer).toString('base64');
+    const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+    
+    const uploadResponse = await cloudinary.uploader.upload(dataURI, {
+      folder: 'profile_pictures',
+      resource_type: 'auto'
+    });
+
+    // Update user in database
+    await User.findByIdAndUpdate(req.user.id, {
+      profilePicture: uploadResponse.secure_url
+    });
+
+    // Update all posts
+    await Post.updateMany(
+      { author: req.user.id },
+      { profilePicture: uploadResponse.secure_url }
+    );
+
+    // Update all comments
+    await Comment.updateMany(
+      { author: req.user.id },
+      { profilePicture: uploadResponse.secure_url }
+    );
+
+    // Update all notifications
+    await Notification.updateMany(
+      { 'sender._id': req.user.id },
+      { 'sender.profilePicture': uploadResponse.secure_url }
+    );
+
+    res.json({ imageUrl: uploadResponse.secure_url });
+  } catch (err) {
+    console.error('Avatar upload error:', err);
+    res.status(500).json({ msg: "Error uploading avatar" });
   }
 });
 

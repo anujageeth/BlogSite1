@@ -6,7 +6,10 @@ const postSchema = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
-  profilePicture: { type: String },
+  profilePicture: {
+    type: String,
+    default: ''
+  },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   image: {
     type: String,

@@ -62,7 +62,8 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
       image: imageUrl,
       author: req.user.id,
       firstName: req.user.firstName,
-      lastName: req.user.lastName
+      lastName: req.user.lastName,
+      profilePicture: req.user.profilePicture // Add this line
     });
 
     await post.save();
