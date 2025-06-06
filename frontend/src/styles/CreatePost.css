@@ -101,9 +101,47 @@
   box-shadow: 0 2px 4px rgba(255, 129, 0, 0.2);
 }
 
+.buttons-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px; /* Adjust gap to be consistent */
+  margin-top: 10px;
+}
+
 .image-upload-container {
-  margin-bottom: 20px;
-  text-align: center;
+  margin-bottom: 0;
+}
+
+.improve-button-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: rgba(255, 129, 0, 0.1);
+  border: 1px solid rgba(255, 129, 0, 0.2);
+  border-radius: 12px;
+  color: #ff8100;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0;
+  margin-left: 0;
+  height: 44px; /* Match height with image upload button */
+  width: auto;
+}
+
+.improve-button-bottom:hover:not(:disabled) {
+  background: rgba(255, 129, 0, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 129, 0, 0.1);
+}
+
+.improve-button-bottom:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .image-upload-input {
@@ -111,10 +149,12 @@
 }
 
 .image-upload-label {
+  height: 44px;
+  padding: 0 16px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
+  justify-content: center;
+  gap: 6px;
   background: rgba(255, 129, 0, 0.1);
   color: #ff8100;
   border: 1px dashed #ff8100;
@@ -123,6 +163,8 @@
   font-size: 14px;
   font-weight: 500;
   transition: all 0.3s ease;
+  min-width: 120px; /* Add minimum width */
+  box-sizing: border-box; /* Ensure padding is included in height */
 }
 
 .image-upload-label:hover {
@@ -171,4 +213,102 @@
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;
+}
+
+.content-area {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.improve-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255, 129, 0, 0.1);
+  border: 1px solid rgba(255, 129, 0, 0.2);
+  border-radius: 8px;
+  color: #ff8100;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.improve-button:hover:not(:disabled) {
+  background: rgba(255, 129, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.improve-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 129, 0, 0.3);
+  border-top-color: #ff8100;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.improve-icon {
+  transition: transform 0.3s ease;
+}
+
+.improve-button-bottom:hover:not(:disabled) .improve-icon {
+  animation: rotate 2s linear infinite;
+}
+
+.add-image-icon {
+  transition: transform 0.3s ease;
+}
+
+.image-upload-label:hover .add-image-icon {
+  animation: swing 1s ease infinite;
+}
+
+@keyframes swing {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(12deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .buttons-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .image-upload-container,
+  .improve-button-bottom {
+    width: 100%;
+  }
 }
