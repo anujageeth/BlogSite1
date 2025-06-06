@@ -214,7 +214,13 @@ function Navbar() {
               </div>
               {isDropdownOpen && (
                 <div className="dropdown-menu">
-                  <Link to="/profile" className="dropdown-item">Profile</Link>
+                  <Link 
+                    to={`/profile/${userInfo.id}`} 
+                    className="dropdown-item"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    Profile
+                  </Link>
                   <button onClick={logout} className="dropdown-item">Logout</button>
                 </div>
               )}
