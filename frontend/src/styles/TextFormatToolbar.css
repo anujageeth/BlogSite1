@@ -1,0 +1,112 @@
+Personal\Projects\blog-site-1\frontend\src\styles\TextFormatToolbar.css
+.format-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 129, 0, 0.2);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  width: fit-content; /* Make toolbar width match content */
+}
+
+.format-button {
+  display: inline-flex; /* Change to inline-flex */
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Update hover and active states */
+.format-button:hover {
+  background: rgba(255, 129, 0, 0.1);
+  color: #ff8100;
+  border-color: rgba(255, 129, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.format-button:active {
+  transform: translateY(0px);
+}
+
+.format-button.active {
+  background: rgba(255, 129, 0, 0.1);
+  color: #ff8100;
+  border-color: rgba(255, 129, 0, 0.2);
+}
+
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::before,
+[data-tooltip]::after {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-tooltip]::before {
+  content: attr(data-tooltip);
+  bottom: -56px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(255, 129, 0, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #ff8100;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(255, 129, 0, 0.1);
+  border: 1px solid rgba(255, 129, 0, 0.2);
+  z-index: 2000;
+}
+
+[data-tooltip]::after {
+  content: '';
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-bottom-color: rgba(255, 129, 0, 0.1);
+  z-index: 2000;
+}
+
+[data-tooltip]:hover::before,
+[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+[data-tooltip]:hover::before {
+  transform: translateX(-50%) translateY(-8px);
+}
+
+[data-tooltip]:hover::after {
+  transform: translateX(-50%) translateY(-8px);
+}
+
+[data-tooltip]:active::before,
+[data-tooltip]:active::after {
+  opacity: 0;
+  visibility: hidden;
+}
+
+[data-tooltip]:not(:hover)::before,
+[data-tooltip]:not(:hover)::after {
+  transition-delay: 0s;
+}

@@ -423,7 +423,6 @@ function Profile() {
             <button 
               className="search-capsule"
               onClick={() => setIsSearchOpen(true)}
-              //data-tooltip="Search Posts"
             >
               <svg 
                 width="16" 
@@ -444,7 +443,10 @@ function Profile() {
           {userPosts.map(post => (
             <PostCard
               key={post._id}
-              post={post}
+              post={{
+                ...post,
+                content: post.content // The content is already in HTML format from backend
+              }}
               currentUser={userInfo}
               onDelete={handleDelete}
             />

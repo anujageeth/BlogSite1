@@ -1,9 +1,20 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/CreatePost.css';
 import Toast from '../components/Toast';
 import Navbar from '../components/NavBar';  // Add this import
+import TextFormatToolbar from '../components/TextFormatToolbar';
+
+const wrapText = (text, selectionStart, selectionEnd, wrapper) => {
+  const before = text.substring(0, selectionStart);
+  const selected = text.substring(selectionStart, selectionEnd);
+  const after = text.substring(selectionEnd);
+  return {
+    text: before + wrapper[0] + selected + wrapper[1] + after,
+    newPosition: selectionEnd + wrapper[0].length + wrapper[1].length
+  };
+};
 
 function CreatePost() {
   const [title, setTitle] = useState('');
@@ -14,6 +25,7 @@ function CreatePost() {
   const [toast, setToast] = useState({ show: false, message: '' });
   const [isImproving, setIsImproving] = useState(false);
   const navigate = useNavigate();
+  const textareaRef = useRef(null);
 
   const token = localStorage.getItem('token');
   if (!token) {
@@ -101,6 +113,45 @@ function CreatePost() {
     }
   };
 
+  // Update the handleFormat function
+  const handleFormat = (style) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    const scrollTop = textarea.scrollTop; // Store scroll position
+
+    let wrapper;
+    switch (style) {
+      case 'bold':
+        wrapper = ['**', '**'];
+        break;
+      case 'italic':
+        wrapper = ['*', '*'];
+        break;
+      case 'underline':
+        wrapper = ['__', '__'];
+        break;
+      default:
+        return;
+    }
+
+    const { text, newPosition } = wrapText(content, start, end, wrapper);
+    setContent(text);
+
+    // Restore focus, selection, and scroll position after state update
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(
+        start + wrapper[0].length,
+        end + wrapper[0].length
+      );
+      textarea.scrollTop = scrollTop; // Restore scroll position
+    }, 0);
+  };
+
   return (
     <>
       <Navbar />
@@ -137,7 +188,9 @@ function CreatePost() {
             required
           />
           <div className="content-area">
+            <TextFormatToolbar onFormat={handleFormat} />
             <textarea 
+              ref={textareaRef}
               className="create-post-textarea"
               value={content} 
               onChange={e => setContent(e.target.value)} 

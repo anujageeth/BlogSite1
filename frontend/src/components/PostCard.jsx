@@ -15,6 +15,7 @@ function PostCard({ post, currentUser, onDelete }) {
   const [commentCount, setCommentCount] = useState(post.comments || 0);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '' });
+  const [userInfo, setUserInfo] = useState(null);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -61,6 +62,25 @@ function PostCard({ post, currentUser, onDelete }) {
       fetchLikes();
     }
   }, [post._id, currentUser]);
+
+  // Add useEffect to fetch user info
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (!post?.author?._id) return;
+      
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/auth/profile/${post.author._id}`,
+          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        );
+        setUserInfo(res.data);
+      } catch (err) {
+        console.error('Error fetching user info:', err);
+      }
+    };
+
+    fetchUserInfo();
+  }, [post]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -153,8 +173,22 @@ function PostCard({ post, currentUser, onDelete }) {
           <div 
             className="post-author" 
             onClick={handleAuthorClick}
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: 'pointer', position: 'relative' }}
           >
+            <div className="post-author-tooltip">
+              <strong>{post.author?.firstName || post.firstName} {post.author?.lastName || post.lastName}</strong>
+              <span className="tooltip-plug-ins">
+                {userInfo?.subscribers?.length || 0} Plug-ins
+              </span>
+              {/* {userInfo?.about && (
+                <p className="tooltip-about">
+                  {userInfo.about.length > 100 
+                    ? userInfo.about.substring(0, 100) + '...' 
+                    : userInfo.about
+                  }
+                </p>
+              )} */}
+            </div>
             <Avatar
               firstName={post.author?.firstName || post.firstName}
               lastName={post.author?.lastName || post.lastName}
@@ -328,7 +362,10 @@ function PostCard({ post, currentUser, onDelete }) {
           >
             <div className="post-text">
               <h3 className="post-title">{post.title}</h3>
-              <p className="post-content">{post.content}</p>
+              <p 
+                className="post-content"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
             </div>
             {post.image && (
               <div className="post-thumbnail">

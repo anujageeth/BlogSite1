@@ -24,6 +24,7 @@ function PostDetail() {
   const [toast, setToast] = useState({ show: false, message: '' });
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
   const dropdownRef = useRef(null);
   const commentsRef = useRef(null);
   const commentInputRef = useRef(null);
@@ -117,6 +118,25 @@ function PostDetail() {
 
     fetchSubscriptionStatus();
   }, [post, currentUser]);
+
+  // Add after other useEffect hooks
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (!post?.author?._id) return;
+      
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/auth/profile/${post.author._id}`,
+          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        );
+        setUserInfo(res.data);
+      } catch (err) {
+        console.error('Error fetching user info:', err);
+      }
+    };
+
+    fetchUserInfo();
+  }, [post]);
 
   const handleDelete = async () => {
     try {
@@ -299,12 +319,18 @@ function PostDetail() {
             <div 
               className="post-author" 
               onClick={handleAuthorClick}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: 'pointer', position: 'relative' }}
             >
+              <div className="post-author-tooltip">
+                <strong>{post.firstName} {post.lastName}</strong>
+                <span className="tooltip-plug-ins">
+                  {userInfo?.subscribers?.length || 0} Plug-ins
+                </span>
+              </div>
               <Avatar
                 firstName={post.firstName}
                 lastName={post.lastName}
-                profilePicture={post.profilePicture} // Make sure this is passed
+                profilePicture={post.profilePicture}
                 size="medium"
               />
               <div className="author-info">
@@ -451,7 +477,10 @@ function PostDetail() {
             </div>
           )}
           
-          <p className="post-detail-content">{post.content}</p>
+          <p 
+            className="post-detail-content"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
           
           {/* Update the post-detail-footer section */}
           <div className="post-detail-footer">

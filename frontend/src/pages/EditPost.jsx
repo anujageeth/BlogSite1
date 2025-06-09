@@ -1,9 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/NavBar';
 import '../styles/CreatePost.css';
 import Toast from '../components/Toast';
+import TextFormatToolbar from '../components/TextFormatToolbar';
+
+const wrapText = (text, selectionStart, selectionEnd, wrapper) => {
+  const before = text.substring(0, selectionStart);
+  const selected = text.substring(selectionStart, selectionEnd);
+  const after = text.substring(selectionEnd);
+  return {
+    text: before + wrapper[0] + selected + wrapper[1] + after,
+    newPosition: selectionEnd + wrapper[0].length + wrapper[1].length
+  };
+};
+
+const htmlToMarkdown = (html) => {
+  return html
+    .replace(/<strong>(.*?)<\/strong>/g, '**$1**')
+    .replace(/<em>(.*?)<\/em>/g, '*$1*')
+    .replace(/<u>(.*?)<\/u>/g, '__$1__');
+};
 
 function EditPost() {
   const [title, setTitle] = useState('');
@@ -16,6 +34,7 @@ function EditPost() {
   const [isImproving, setIsImproving] = useState(false);
   const { postId } = useParams();
   const navigate = useNavigate();
+  const textareaRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -30,7 +49,8 @@ function EditPost() {
           headers: { Authorization: `Bearer ${token}` }
         });
         setTitle(res.data.title);
-        setContent(res.data.content);
+        // Convert HTML to Markdown before setting content
+        setContent(htmlToMarkdown(res.data.content));
       } catch (err) {
         console.error('Error fetching post:', err);
         setError('Failed to load post');
@@ -117,6 +137,44 @@ function EditPost() {
     }
   };
 
+  const handleFormat = (style) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    const scrollTop = textarea.scrollTop;
+
+    let wrapper;
+    switch (style) {
+      case 'bold':
+        wrapper = ['**', '**'];
+        break;
+      case 'italic':
+        wrapper = ['*', '*'];
+        break;
+      case 'underline':
+        wrapper = ['__', '__'];
+        break;
+      default:
+        return;
+    }
+
+    const { text } = wrapText(content, start, end, wrapper);
+    setContent(text);
+
+    // Restore focus, selection, and scroll position
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(
+        start + wrapper[0].length,
+        end + wrapper[0].length
+      );
+      textarea.scrollTop = scrollTop;
+    }, 0);
+  };
+
   if (isLoading) return <div>Loading...</div>;
 
   return (
@@ -135,7 +193,9 @@ function EditPost() {
             required
           />
           <div className="content-area">
+            <TextFormatToolbar onFormat={handleFormat} />
             <textarea
+              ref={textareaRef}
               className="create-post-textarea"
               value={content}
               onChange={(e) => setContent(e.target.value)}

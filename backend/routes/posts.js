@@ -236,8 +236,8 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// Update post
-router.put('/:id', authMiddleware, async (req, res) => {
+// Update the put route for editing posts
+router.put('/:id', authMiddleware, upload.single('image'), async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     
@@ -253,8 +253,26 @@ router.put('/:id', authMiddleware, async (req, res) => {
     const { title, content } = req.body;
     post.title = title;
     post.content = content;
-    await post.save();
 
+    // Handle image upload if provided
+    if (req.file) {
+      try {
+        const b64 = Buffer.from(req.file.buffer).toString('base64');
+        const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+        
+        const uploadResponse = await cloudinary.uploader.upload(dataURI, {
+          folder: 'blog_images',
+          resource_type: 'auto'
+        });
+        
+        post.image = uploadResponse.secure_url;
+      } catch (uploadErr) {
+        console.error('Cloudinary upload error:', uploadErr);
+        return res.status(500).json({ msg: "Error uploading image" });
+      }
+    }
+
+    await post.save();
     res.json({ msg: "Post updated successfully", post });
   } catch (err) {
     console.error('Update error:', err);
