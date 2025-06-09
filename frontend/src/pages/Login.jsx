@@ -26,7 +26,7 @@ function Login() {
           setError('Passwords do not match');
           return;
         }
-        await axios.post('https://elastic-tasteful-begonia.glitch.me/api/auth/register', { 
+        await axios.post('https://aware-oil-mum.glitch.me/api/auth/register', { 
           email, 
           password,
           firstName,
@@ -46,7 +46,7 @@ function Login() {
         setLastName('');
         setDateOfBirth('');
       } else {
-        const res = await axios.post('https://elastic-tasteful-begonia.glitch.me/api/auth/login', { email, password });
+        const res = await axios.post('https://aware-oil-mum.glitch.me/api/auth/login', { email, password });
         if (res.data.token) {
           localStorage.setItem('token', res.data.token);
           setToast({
@@ -151,7 +151,7 @@ function Login() {
         </button>
         <button
           className="google-login-button"
-          onClick={() => window.location.href = 'https://elastic-tasteful-begonia.glitch.me/api/auth/google'}
+          onClick={() => window.location.href = 'https://aware-oil-mum.glitch.me/api/auth/google'}
         >
           <svg viewBox="0 0 24 24" width="24" height="24">
             <path

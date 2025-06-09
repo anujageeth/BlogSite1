@@ -45,7 +45,7 @@ function EditPost() {
 
     const fetchPost = async () => {
       try {
-        const res = await axios.get(`https://elastic-tasteful-begonia.glitch.me/api/posts/${postId}`, {
+        const res = await axios.get(`https://aware-oil-mum.glitch.me/api/posts/${postId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setTitle(res.data.title);
@@ -87,7 +87,7 @@ function EditPost() {
     setIsImproving(true);
     try {
       const response = await axios.post(
-        'https://elastic-tasteful-begonia.glitch.me/api/ai/improve-content',
+        'https://aware-oil-mum.glitch.me/api/ai/improve-content',
         { content },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -117,7 +117,7 @@ function EditPost() {
       }
 
       await axios.put(
-        `https://elastic-tasteful-begonia.glitch.me/api/posts/${postId}`,
+        `https://aware-oil-mum.glitch.me/api/posts/${postId}`,
         formData,
         { 
           headers: { 

@@ -67,7 +67,7 @@ function CreatePost() {
         formData.append('image', image);
       }
 
-      const response = await axios.post('https://elastic-tasteful-begonia.glitch.me/api/posts', formData, {
+      const response = await axios.post('https://aware-oil-mum.glitch.me/api/posts', formData, {
         headers: { 
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'multipart/form-data'
@@ -96,7 +96,7 @@ function CreatePost() {
     setIsImproving(true);
     try {
       const response = await axios.post(
-        'https://elastic-tasteful-begonia.glitch.me/api/ai/improve-content',
+        'https://aware-oil-mum.glitch.me/api/ai/improve-content',
         { content },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }

@@ -40,7 +40,7 @@ function Search({ isOpen, onClose, userId }) {
           });
 
           const res = await axios.get(
-            `https://elastic-tasteful-begonia.glitch.me/api/posts/search?${params}`,
+            `https://aware-oil-mum.glitch.me/api/posts/search?${params}`,
             {
               headers: { Authorization: `Bearer ${token}` }
             }

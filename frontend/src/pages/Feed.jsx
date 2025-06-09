@@ -24,7 +24,7 @@ function Feed() {
 
     const fetchPosts = async () => {
       try {
-        const res = await axios.get('https://elastic-tasteful-begonia.glitch.me/api/posts');
+        const res = await axios.get('https://aware-oil-mum.glitch.me/api/posts');
         console.log('Fetched posts:', res.data); // Debug log
         setPosts(res.data);
       } catch (err) {
@@ -37,7 +37,7 @@ function Feed() {
 
   const handleDelete = async (postId) => {
     try {
-      await axios.delete(`https://elastic-tasteful-begonia.glitch.me/api/posts/${postId}`, {
+      await axios.delete(`https://aware-oil-mum.glitch.me/api/posts/${postId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setPosts(posts.filter(post => post._id !== postId));

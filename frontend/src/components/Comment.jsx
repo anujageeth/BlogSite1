@@ -26,7 +26,7 @@ function Comment({ comment, currentUser, postAuthor, onDelete }) {
       
       try {
         const res = await axios.get(
-          `https://elastic-tasteful-begonia.glitch.me/api/auth/profile/${comment.author}`,
+          `https://aware-oil-mum.glitch.me/api/auth/profile/${comment.author}`,
           { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
         );
         setUserInfo(res.data);

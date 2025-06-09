@@ -25,7 +25,7 @@ function PostCard({ post, currentUser, onDelete }) {
   const fetchLikes = async () => {
     try {
       const res = await axios.get(
-        `https://elastic-tasteful-begonia.glitch.me/api/posts/${post._id}/likes`,
+        `https://aware-oil-mum.glitch.me/api/posts/${post._id}/likes`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         }
@@ -44,7 +44,7 @@ function PostCard({ post, currentUser, onDelete }) {
       
       try {
         const res = await axios.get(
-          `https://elastic-tasteful-begonia.glitch.me/api/auth/subscribe/${post.author._id}`,
+          `https://aware-oil-mum.glitch.me/api/auth/subscribe/${post.author._id}`,
           { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
         );
         setIsSubscribed(res.data.isSubscribed);
@@ -70,7 +70,7 @@ function PostCard({ post, currentUser, onDelete }) {
       
       try {
         const res = await axios.get(
-          `https://elastic-tasteful-begonia.glitch.me/api/auth/profile/${post.author._id}`,
+          `https://aware-oil-mum.glitch.me/api/auth/profile/${post.author._id}`,
           { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
         );
         setUserInfo(res.data);
@@ -107,7 +107,7 @@ function PostCard({ post, currentUser, onDelete }) {
 
     try {
       const res = await axios.put(  // Changed from post to put
-        `https://elastic-tasteful-begonia.glitch.me/api/posts/${post._id}/like`,
+        `https://aware-oil-mum.glitch.me/api/posts/${post._id}/like`,
         {},
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
@@ -143,7 +143,7 @@ function PostCard({ post, currentUser, onDelete }) {
 
     try {
       const res = await axios.put(
-        `https://elastic-tasteful-begonia.glitch.me/api/auth/subscribe/${post.author._id}`,
+        `https://aware-oil-mum.glitch.me/api/auth/subscribe/${post.author._id}`,
         {},
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
