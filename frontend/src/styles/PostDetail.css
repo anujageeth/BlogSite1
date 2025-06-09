@@ -551,6 +551,16 @@
     padding: 6px 12px;
     font-size: 13px;
   }
+
+  .header-actions .interaction-button {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  
+  .header-actions .interaction-button svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 html {
@@ -595,8 +605,30 @@ html {
   cursor: not-allowed;
 }
 
-.subscriber-count {
-  font-size: 12px;
-  opacity: 0.8;
-  margin-left: 4px;
+.header-actions {
+  margin: 0;
+  padding: 0;
+}
+
+.header-actions .interaction-button {
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 129, 0, 0.2);
+  color: #ff8100;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header-actions .interaction-button:hover {
+  background: rgba(255, 129, 0, 0.1);
+  border-color: #ff8100;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 129, 0, 0.1);
+}
+
+.header-actions .interaction-button:active {
+  transform: translateY(0);
+  box-shadow: none;
 }

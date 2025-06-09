@@ -8,6 +8,7 @@ import postRoutes from './routes/posts.js';
 import notificationRoutes from './routes/notifications.js';
 // Add this import
 import aiRoutes from './routes/ai.js';
+import passport from './config/passport.js';
 
 dotenv.config();
 const app = express();
@@ -19,6 +20,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/notifications', notificationRoutes);
 // Add this route
 app.use('/api/ai', aiRoutes);
+app.use(passport.initialize());
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => app.listen(process.env.PORT, () => console.log("Server started at port", process.env.PORT)))

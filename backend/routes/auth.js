@@ -8,6 +8,7 @@ import Notification from '../models/Notification.js';
 import upload from '../middleware/upload.js';
 import cloudinary from '../config/cloudinary.js';
 import { authMiddleware } from '../middleware/auth.js';  // Add this import
+import passport from 'passport';
 
 const router = express.Router();
 
@@ -333,5 +334,28 @@ router.delete('/delete-account', authMiddleware, async (req, res) => {
     res.status(500).json({ msg: "Error deleting account" });
   }
 });
+
+router.get('/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+router.get('/google/callback',
+  passport.authenticate('google', { session: false }),
+  (req, res) => {
+    // Generate JWT token
+    const token = jwt.sign({ 
+      id: req.user._id, 
+      email: req.user.email,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+      profilePicture: req.user.profilePicture
+    }, process.env.JWT_SECRET, {
+      expiresIn: '1h'
+    });
+
+    // Redirect to frontend with token
+    res.redirect(`http://localhost:3000/oauth-callback?token=${token}`);
+  }
+);
 
 export default router;

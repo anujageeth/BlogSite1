@@ -6,6 +6,7 @@ import CreatePost from './pages/CreatePost';
 import Profile from './pages/Profile';
 import EditPost from './pages/EditPost';
 import PostDetail from './pages/PostDetail';
+import OAuthCallback from './pages/OAuthCallback';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/profile/:userId" element={<Profile />} />
         <Route path="/edit-post/:postId" element={<EditPost />} />
         <Route path="/post/:postId" element={<PostDetail />} />
+        <Route path="/oauth-callback" element={<OAuthCallback />} />
       </Routes>
     </BrowserRouter>
   );
