@@ -67,7 +67,7 @@ function CreatePost() {
         formData.append('image', image);
       }
 
-      const response = await axios.post('http://localhost:5000/api/posts', formData, {
+      const response = await axios.post('https://elastic-tasteful-begonia.glitch.me/api/posts', formData, {
         headers: { 
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'multipart/form-data'
@@ -96,7 +96,7 @@ function CreatePost() {
     setIsImproving(true);
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/ai/improve-content',
+        'https://elastic-tasteful-begonia.glitch.me/api/ai/improve-content',
         { content },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }

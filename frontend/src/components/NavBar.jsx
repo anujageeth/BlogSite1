@@ -43,7 +43,7 @@ function Navbar() {
     if (!token) return;
 
     try {
-      const res = await axios.get('http://localhost:5000/api/notifications', {
+      const res = await axios.get('https://elastic-tasteful-begonia.glitch.me/api/notifications', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -74,7 +74,7 @@ function Navbar() {
     setIsNotificationOpen(!isNotificationOpen);
     if (unreadCount > 0) {
       try {
-        await axios.put('http://localhost:5000/api/notifications/read', {}, {
+        await axios.put('https://elastic-tasteful-begonia.glitch.me/api/notifications/read', {}, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         setUnreadCount(0);

@@ -40,7 +40,7 @@ function Search({ isOpen, onClose, userId }) {
           });
 
           const res = await axios.get(
-            `http://localhost:5000/api/posts/search?${params}`,
+            `https://elastic-tasteful-begonia.glitch.me/api/posts/search?${params}`,
             {
               headers: { Authorization: `Bearer ${token}` }
             }
