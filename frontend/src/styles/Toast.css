@@ -49,6 +49,13 @@
   stroke-width: 3;
 }
 
+.toast.error svg {
+  color: #ff3b30;
+  width: 32px;
+  height: 32px;
+  animation: errorAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s both;
+}
+
 .toast-content span {
   font-size: 15px;
   font-weight: 500;
@@ -94,6 +101,17 @@
   }
   100% {
     transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes errorAppear {
+  0% {
+    transform: scale(0.5) rotate(-15deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0);
     opacity: 1;
   }
 }

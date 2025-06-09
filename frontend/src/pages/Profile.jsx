@@ -205,41 +205,40 @@ function Profile() {
       return;
     }
 
-    // Set current user from token
-    const decoded = JSON.parse(atob(token.split('.')[1]));
-    setCurrentUser(decoded);
-
     const fetchUserData = async () => {
       try {
-        let userData;
-        // If viewing own profile
-        if (userId === decoded.id) {
-          userData = decoded;
-          setUserInfo(decoded);
+        const decoded = JSON.parse(atob(token.split('.')[1]));
+        setCurrentUser(decoded);
+
+        // Always fetch complete user data from API
+        const res = await axios.get(
+          `http://localhost:5000/api/auth/profile/${userId || decoded.id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        const userData = res.data;
+        setUserInfo(userData);
+        
+        // Update form data if viewing own profile
+        if (!userId || userId === decoded.id) {
           setUpdateData(prev => ({
             ...prev,
-            firstName: decoded.firstName,
-            lastName: decoded.lastName,
-            email: decoded.email,
-            profilePicture: decoded.profilePicture,
-            about: decoded.about || '' // Add this line
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            email: userData.email,
+            profilePicture: userData.profilePicture,
+            about: userData.about || ''
           }));
-        } else {
-          // If viewing another user's profile
-          const res = await axios.get(`http://localhost:5000/api/auth/profile/${userId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          userData = res.data;
-          setUserInfo(res.data);
         }
 
         // Set subscriber count
         setSubscriberCount(userData.subscribers?.length || 0);
 
         // Fetch user's posts
-        const postsRes = await axios.get(`http://localhost:5000/api/posts/user/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const postsRes = await axios.get(
+          `http://localhost:5000/api/posts/user/${userId || decoded.id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         setUserPosts(postsRes.data);
       } catch (err) {
         console.error('Error fetching user data:', err);
@@ -363,20 +362,74 @@ function Profile() {
                 size="large"
               />
               <div className="profile-info">
-                <h2 className="profile-title">Profile</h2>
-                <p><strong>Name:</strong> {userInfo.firstName} {userInfo.lastName}</p>
-                <p><strong>Email:</strong> {userInfo.email}</p>
-                <div className="about-section">
-                  <h3 className="about-heading">About</h3>
-                  {userInfo.about ? (
-                    <p className="about-text">{userInfo.about}</p>
-                  ) : (
-                    <p className="about-text empty">No description provided</p>
+                <div className="profile-info-header">
+                  <h2 className="user-name">{userInfo.firstName} {userInfo.lastName}</h2>
+                  {isOwnProfile && (
+                    <button 
+                      className="settings-button"
+                      onClick={() => setIsEditing(true)}
+                      aria-label="Edit profile"
+                    >
+                      <svg 
+                        width="20" 
+                        height="20" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+                    </button>
                   )}
                 </div>
-                <p className="subscriber-count">
-                  <strong>Plugged ins:</strong> {subscriberCount}
+                <p className="about-text">
+                  {userInfo.about || "No description provided"}
                 </p>
+                <div className="profile-stats">
+                  <p><strong>Email:</strong> {userInfo.email}</p>
+                  <p className="subscriber-count">
+                    <svg 
+                      width="16" 
+                      height="16" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="stats-icon"
+                    >
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                      <circle cx="9" cy="7" r="4"/>
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    <strong>Plugged ins:</strong> {subscriberCount}
+                  </p>
+                  <p className="posts-count">
+                    <svg 
+                      width="16" 
+                      height="16" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="stats-icon"
+                    >
+                      <path d="M21 14h-7m-4 0H3"/>
+                      <path d="M21 19h-7m-4 0H3"/>
+                      <path d="M21 9h-7m-4 0H3"/>
+                      <path d="M21 4h-7m-4 0H3"/>
+                    </svg>
+                    <strong>Posts:</strong> {userPosts.length}
+                  </p>
+                </div>
               </div>
             </div>
             {!isOwnProfile && (
@@ -408,14 +461,6 @@ function Profile() {
               </button>
             )}
           </div>
-          {isOwnProfile && (
-            <button 
-              className="edit-button"
-              onClick={() => setIsEditing(true)}
-            >
-              Edit Profile
-            </button>
-          )}
         </div>
 
         <div className="user-posts">
