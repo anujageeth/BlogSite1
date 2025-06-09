@@ -12,6 +12,7 @@ import Toast from '../components/Toast';
 // Separate EditModal into its own component
 const EditModal = ({ updateData, setUpdateData, handleUpdate, error, onClose, userInfo }) => {
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -113,36 +114,6 @@ const EditModal = ({ updateData, setUpdateData, handleUpdate, error, onClose, us
             placeholder="Last Name"
             required
           />
-          <input
-            type="email"
-            className="edit-input"
-            value={updateData.email}
-            onChange={(e) => setUpdateData(prev => ({...prev, email: e.target.value}))}
-            placeholder="Email"
-            required
-          />
-          <input
-            type="password"
-            className="edit-input"
-            value={updateData.currentPassword}
-            onChange={(e) => setUpdateData(prev => ({...prev, currentPassword: e.target.value}))}
-            placeholder="Current Password"
-            required
-          />
-          <input
-            type="password"
-            className="edit-input"
-            value={updateData.newPassword}
-            onChange={(e) => setUpdateData(prev => ({...prev, newPassword: e.target.value}))}
-            placeholder="New Password (optional)"
-          />
-          <input
-            type="password"
-            className="edit-input"
-            value={updateData.confirmNewPassword}
-            onChange={(e) => setUpdateData(prev => ({...prev, confirmNewPassword: e.target.value}))}
-            placeholder="Confirm New Password"
-          />
           <textarea
             className="edit-input about-input"
             value={updateData.about}
@@ -150,6 +121,41 @@ const EditModal = ({ updateData, setUpdateData, handleUpdate, error, onClose, us
             placeholder="About me"
             rows={4}
           />
+          
+          <button 
+            type="button" 
+            className="toggle-password-button"
+            onClick={() => setShowPasswordFields(!showPasswordFields)}
+          >
+            {showPasswordFields ? 'Hide Password Fields' : 'Change Password'}
+          </button>
+
+          {showPasswordFields && (
+            <>
+              <input
+                type="password"
+                className="edit-input"
+                value={updateData.currentPassword}
+                onChange={(e) => setUpdateData(prev => ({...prev, currentPassword: e.target.value}))}
+                placeholder="Current Password"
+              />
+              <input
+                type="password"
+                className="edit-input"
+                value={updateData.newPassword}
+                onChange={(e) => setUpdateData(prev => ({...prev, newPassword: e.target.value}))}
+                placeholder="New Password"
+              />
+              <input
+                type="password"
+                className="edit-input"
+                value={updateData.confirmNewPassword}
+                onChange={(e) => setUpdateData(prev => ({...prev, confirmNewPassword: e.target.value}))}
+                placeholder="Confirm New Password"
+              />
+            </>
+          )}
+
           {error && <div className="error-message">{error}</div>}
           <div className="button-group">
             <button type="submit" className="save-button">Save Changes</button>

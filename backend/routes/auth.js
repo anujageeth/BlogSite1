@@ -52,37 +52,33 @@ router.post('/login', async (req, res) => {
 
 // Update the update route
 router.put('/update', authMiddleware, async (req, res) => {
-  const { firstName, lastName, email, currentPassword, newPassword, profilePicture, about } = req.body;
+  const { firstName, lastName, currentPassword, newPassword, profilePicture, about } = req.body;
   
   try {
     const user = await User.findById(req.user.id);
     
-    // Verify current password
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) return res.status(400).json({ msg: "Current password is incorrect" });
+    // If updating password, verify current password
+    if (newPassword) {
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) return res.status(400).json({ msg: "Current password is incorrect" });
+      user.password = await bcrypt.hash(newPassword, 10);
+    }
 
     // Check if name is being updated
     const isNameChanged = user.firstName !== firstName || user.lastName !== lastName;
 
-    // Update user details
+    // Update basic info without password
     user.firstName = firstName;
     user.lastName = lastName;
-    user.email = email;
-    user.about = about; // Add this line
+    user.about = about;
     if (profilePicture) {
       user.profilePicture = profilePicture;
-    }
-    
-    // Update password if provided
-    if (newPassword) {
-      user.password = await bcrypt.hash(newPassword, 10);
     }
 
     await user.save();
 
     // If name changed, update posts and comments
     if (isNameChanged) {
-      // Update all posts by this user
       await Post.updateMany(
         { author: user._id },
         { 
@@ -92,7 +88,6 @@ router.put('/update', authMiddleware, async (req, res) => {
         }
       );
 
-      // Update all comments by this user
       await Comment.updateMany(
         { author: user._id },
         { 
