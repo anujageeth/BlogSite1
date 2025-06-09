@@ -398,3 +398,86 @@
     gap: 12px;
   }
 }
+
+.file-input {
+  display: none;
+}
+
+.upload-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255, 129, 0, 0.1);
+  color: #ff8100;
+  border: 1px solid rgba(255, 129, 0, 0.3);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  min-width: 180px;
+  justify-content: center;
+}
+
+.upload-label:hover {
+  background: rgba(255, 129, 0, 0.2);
+  border-color: #ff8100;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 129, 0, 0.15);
+}
+
+.upload-label:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.upload-label.uploading {
+  background: rgba(255, 129, 0, 0.05);
+  color: #999;
+  cursor: not-allowed;
+  border-color: rgba(255, 129, 0, 0.2);
+}
+
+.upload-label.uploading:hover {
+  transform: none;
+  box-shadow: none;
+  background: rgba(255, 129, 0, 0.05);
+}
+
+.upload-button-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Toggle password button */
+.toggle-password-button {
+  background: rgba(255, 129, 0, 0.1);
+  color: #ff8100;
+  border: 1px solid rgba(255, 129, 0, 0.3);
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: calc(100% - 30px);
+  margin: 0 auto;
+  display: block;
+  box-sizing: border-box;
+}
+
+.toggle-password-button:hover {
+  background: rgba(255, 129, 0, 0.2);
+  border-color: #ff8100;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 129, 0, 0.15);
+}
+
+.toggle-password-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}

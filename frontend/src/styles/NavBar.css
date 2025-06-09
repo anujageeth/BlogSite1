@@ -105,7 +105,7 @@
   flex: 1;
 }
 
-.user-name {
+.user-name-card {
   color: #ff8100;
   font-weight: 600;
   font-size: 14px;
@@ -560,4 +560,18 @@
   background: rgba(255, 129, 0, 0.1);
   /* color: #ff8100; */
   transform: translateY(-1px);
+}
+
+.brand-logo {
+  height: 48px;
+  width: 160px; /* 5:1 ratio (160:32) */
+  object-fit: cover; /* This crops the image */
+  object-position: center; /* Centers the crop - adjust if needed */
+  transition: all 0.3s ease;
+  border-radius: 15px;
+  filter: brightness(150%) contrast(101%);
+}
+
+.brand-link:hover .brand-logo {
+  transform: scale(1.05);
 }

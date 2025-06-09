@@ -113,11 +113,12 @@ function Navbar() {
             className="brand-link"
             onClick={handleBrandClick}
           >
-            BlogSpace
+            <img 
+              src="/BlogSite1Logo2.png" 
+              alt="BlogSpace" 
+              className="brand-logo"
+            />
           </Link>
-          {/* <div className="nav-links">
-            <Link to="/feed" className="nav-link">Feed</Link>
-          </div> */}
         </div>
         {userInfo ? (
           <div className="nav-actions">
@@ -242,7 +243,7 @@ function Navbar() {
                     size="small"
                   />
                   <div className="user-details">
-                    <span className="user-name">
+                    <span className="user-name-card">
                       {userInfo.firstName} {userInfo.lastName}
                     </span>
                     <span className="user-email">{userInfo.email}</span>
