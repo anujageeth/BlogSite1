@@ -43,7 +43,7 @@ function Navbar() {
     if (!token) return;
 
     try {
-      const res = await axios.get('https://aware-oil-mum.glitch.me/api/notifications', {
+      const res = await axios.get('https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/notifications', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -74,7 +74,7 @@ function Navbar() {
     setIsNotificationOpen(!isNotificationOpen);
     if (unreadCount > 0) {
       try {
-        await axios.put('https://aware-oil-mum.glitch.me/api/notifications/read', {}, {
+        await axios.put('https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/notifications/read', {}, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         setUnreadCount(0);

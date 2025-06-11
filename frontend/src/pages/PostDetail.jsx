@@ -46,7 +46,7 @@ function PostDetail() {
 
     const fetchPost = async () => {
       try {
-        const res = await axios.get(`https://aware-oil-mum.glitch.me/api/posts/${postId}`, {
+        const res = await axios.get(`https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts/${postId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setPost(res.data);
@@ -66,7 +66,7 @@ function PostDetail() {
       if (!currentUser) return;
       
       try {
-        const res = await axios.get(`https://aware-oil-mum.glitch.me/api/posts/${postId}/likes`, {
+        const res = await axios.get(`https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts/${postId}/likes`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         setIsLiked(res.data.isLiked);
@@ -86,7 +86,7 @@ function PostDetail() {
     const fetchComments = async () => {
       try {
         const res = await axios.get(
-          `https://aware-oil-mum.glitch.me/api/posts/${postId}/comments`,
+          `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts/${postId}/comments`,
           { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
         );
         setComments(res.data);
@@ -107,7 +107,7 @@ function PostDetail() {
       
       try {
         const res = await axios.get(
-          `https://aware-oil-mum.glitch.me/api/auth/subscribe/${post.author._id}`,
+          `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/auth/subscribe/${post.author._id}`,
           { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
         );
         setIsSubscribed(res.data.isSubscribed);
@@ -126,7 +126,7 @@ function PostDetail() {
       
       try {
         const res = await axios.get(
-          `https://aware-oil-mum.glitch.me/api/auth/profile/${post.author._id}`,
+          `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/auth/profile/${post.author._id}`,
           { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
         );
         setUserInfo(res.data);
@@ -141,7 +141,7 @@ function PostDetail() {
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      await axios.delete(`https://aware-oil-mum.glitch.me/api/posts/${postId}`, {
+      await axios.delete(`https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts/${postId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       navigate('/feed');
@@ -162,7 +162,7 @@ function PostDetail() {
 
     try {
       const res = await axios.put(  // Change from post to put
-        `https://aware-oil-mum.glitch.me/api/posts/${postId}/like`,
+        `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts/${postId}/like`,
         {},
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
@@ -183,7 +183,7 @@ function PostDetail() {
     try {
       setIsSubmitting(true);
       const res = await axios.post(
-        `https://aware-oil-mum.glitch.me/api/posts/${postId}/comments`,
+        `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts/${postId}/comments`,
         { content: commentInput },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
@@ -200,7 +200,7 @@ function PostDetail() {
   const handleDeleteComment = async (commentId) => {
     try {
       await axios.delete(
-        `https://aware-oil-mum.glitch.me/api/posts/${postId}/comments/${commentId}`,
+        `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts/${postId}/comments/${commentId}`,
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       // Update comments list after deletion
@@ -220,7 +220,7 @@ function PostDetail() {
 
     try {
       const res = await axios.put(
-        `https://aware-oil-mum.glitch.me/api/auth/subscribe/${post.author._id}`,
+        `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/auth/subscribe/${post.author._id}`,
         {},
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );

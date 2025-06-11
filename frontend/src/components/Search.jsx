@@ -40,7 +40,7 @@ function Search({ isOpen, onClose, userId }) {
           });
 
           const res = await axios.get(
-            `https://aware-oil-mum.glitch.me/api/posts/search?${params}`,
+            `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts/search?${params}`,
             {
               headers: { Authorization: `Bearer ${token}` }
             }

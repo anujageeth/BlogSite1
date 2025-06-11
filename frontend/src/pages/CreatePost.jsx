@@ -67,7 +67,7 @@ function CreatePost() {
         formData.append('image', image);
       }
 
-      const response = await axios.post('https://aware-oil-mum.glitch.me/api/posts', formData, {
+      const response = await axios.post('https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts', formData, {
         headers: { 
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'multipart/form-data'
@@ -96,7 +96,7 @@ function CreatePost() {
     setIsImproving(true);
     try {
       const response = await axios.post(
-        'https://aware-oil-mum.glitch.me/api/ai/improve-content',
+        'https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/ai/improve-content',
         { content },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }

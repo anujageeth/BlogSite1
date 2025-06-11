@@ -26,7 +26,7 @@ function Login() {
           setError('Passwords do not match');
           return;
         }
-        await axios.post('https://aware-oil-mum.glitch.me/api/auth/register', { 
+        await axios.post('https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/auth/register', { 
           email, 
           password,
           firstName,
@@ -46,7 +46,7 @@ function Login() {
         setLastName('');
         setDateOfBirth('');
       } else {
-        const res = await axios.post('https://aware-oil-mum.glitch.me/api/auth/login', { email, password });
+        const res = await axios.post('https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/auth/login', { email, password });
         if (res.data.token) {
           localStorage.setItem('token', res.data.token);
           setToast({
@@ -151,7 +151,7 @@ function Login() {
         </button>
         <button
           className="google-login-button"
-          onClick={() => window.location.href = 'https://aware-oil-mum.glitch.me/api/auth/google'}
+          onClick={() => window.location.href = 'https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/auth/google'}
         >
           <svg viewBox="0 0 24 24" width="24" height="24">
             <path

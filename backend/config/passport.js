@@ -7,7 +7,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://aware-oil-mum.glitch.me/api/auth/google/callback",
+      callbackURL: "https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/auth/google/callback",
       scope: ['profile', 'email']
     },
     async (accessToken, refreshToken, profile, done) => {
