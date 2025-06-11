@@ -579,3 +579,37 @@
   content: ' • ';
   margin: 0 4px;
 }
+
+.post-content a {
+  color: #4b4b4b;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.post-content a:hover {
+  color: #523c1d;
+  border-bottom-color: #ff8100;
+  text-decoration: none;
+}
+
+.post-content a:visited {
+  color: #cc6600;
+}
+
+.post-content a:active {
+  color: #ff6600;
+}
+
+/* Style for external link indicator (optional) */
+.post-content a[target="_blank"]::after {
+  content: ' ↗';
+  font-size: 0.8em;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.post-content a[target="_blank"]:hover::after {
+  opacity: 1;
+}
