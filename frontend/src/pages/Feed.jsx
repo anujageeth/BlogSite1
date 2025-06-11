@@ -24,7 +24,7 @@ function Feed() {
 
     const fetchPosts = async () => {
       try {
-        const res = await axios.get('https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts');
+        const res = await axios.get('https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev/api/posts');
         console.log('Fetched posts:', res.data); // Debug log
         setPosts(res.data);
       } catch (err) {
@@ -37,7 +37,7 @@ function Feed() {
 
   const handleDelete = async (postId) => {
     try {
-      await axios.delete(`https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts/${postId}`, {
+      await axios.delete(`https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev/api/posts/${postId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setPosts(posts.filter(post => post._id !== postId));

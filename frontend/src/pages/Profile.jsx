@@ -29,7 +29,7 @@ const EditModal = ({ updateData, setUpdateData, handleUpdate, error, onClose, us
       const formData = new FormData();
       formData.append('image', file);
 
-      const response = await axios.post('https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/auth/upload-avatar', 
+      const response = await axios.post('https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev/api/auth/upload-avatar', 
         formData,
         {
           headers: { 
@@ -54,7 +54,7 @@ const EditModal = ({ updateData, setUpdateData, handleUpdate, error, onClose, us
       };
 
       // Get new token from backend with updated profile picture
-      const tokenResponse = await axios.post('https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/auth/refresh-token',
+      const tokenResponse = await axios.post('https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev/api/auth/refresh-token',
         { user: updatedUser },
         { headers: { Authorization: `Bearer ${currentToken}` } }
       );
@@ -212,7 +212,7 @@ function Profile() {
 
         // Always fetch complete user data from API
         const res = await axios.get(
-          `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/auth/profile/${userId || decoded.id}`,
+          `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev/api/auth/profile/${userId || decoded.id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -236,7 +236,7 @@ function Profile() {
 
         // Fetch user's posts
         const postsRes = await axios.get(
-          `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts/user/${userId || decoded.id}`,
+          `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev/api/posts/user/${userId || decoded.id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setUserPosts(postsRes.data);
@@ -258,7 +258,7 @@ function Profile() {
       
       try {
         const res = await axios.get(
-          `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/auth/subscribe/${userId}`,
+          `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev/api/auth/subscribe/${userId}`,
           { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
         );
         setIsSubscribed(res.data.isSubscribed);
@@ -281,7 +281,7 @@ function Profile() {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.put('https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/auth/update',
+      const res = await axios.put('https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev/api/auth/update',
         updateData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -305,7 +305,7 @@ function Profile() {
 
   const handleDelete = async (postId) => {
     try {
-      await axios.delete(`https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts/${postId}`, {
+      await axios.delete(`https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev/api/posts/${postId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setUserPosts(userPosts.filter(post => post._id !== postId));
@@ -323,7 +323,7 @@ function Profile() {
 
     try {
       const res = await axios.put(
-        `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/auth/subscribe/${userId}`,
+        `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev/api/auth/subscribe/${userId}`,
         {},
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );

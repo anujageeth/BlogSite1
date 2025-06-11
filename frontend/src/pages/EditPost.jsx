@@ -45,7 +45,7 @@ function EditPost() {
 
     const fetchPost = async () => {
       try {
-        const res = await axios.get(`https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts/${postId}`, {
+        const res = await axios.get(`https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev/api/posts/${postId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setTitle(res.data.title);
@@ -87,7 +87,7 @@ function EditPost() {
     setIsImproving(true);
     try {
       const response = await axios.post(
-        'https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/ai/improve-content',
+        'https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev/api/ai/improve-content',
         { content },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -117,7 +117,7 @@ function EditPost() {
       }
 
       await axios.put(
-        `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev//api/posts/${postId}`,
+        `https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev/api/posts/${postId}`,
         formData,
         { 
           headers: { 
