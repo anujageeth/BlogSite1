@@ -632,3 +632,37 @@ html {
   transform: translateY(0);
   box-shadow: none;
 }
+
+.post-detail-content a {
+  color: #ff8100;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.post-detail-content a:hover {
+  color: #ff9500;
+  border-bottom-color: #ff8100;
+  text-decoration: none;
+}
+
+.post-detail-content a:visited {
+  color: #cc6600;
+}
+
+.post-detail-content a:active {
+  color: #ff6600;
+}
+
+/* Style for external link indicator (optional) */
+.post-detail-content a[target="_blank"]::after {
+  content: ' ↗';
+  font-size: 0.8em;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.post-detail-content a[target="_blank"]:hover::after {
+  opacity: 1;
+}
