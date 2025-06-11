@@ -349,7 +349,7 @@ router.get('/google/callback',
     });
 
     // Redirect to frontend with token
-    res.redirect(`http://localhost:3000/oauth-callback?token=${token}`);
+    res.redirect(`https://495b9df7-a50d-4524-b4a5-88c978129b04-00-92mz2jkdw2ok.sisko.replit.dev/oauth-callback?token=${token}`);
   }
 );
 
